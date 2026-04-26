@@ -45,7 +45,7 @@ var menuTree = []Menu{
 				Perms: []Permission{PermUserRead}},
 			{Key: "admin.credits", Title: "积分管理", Icon: "Coin", Path: "/admin/credits",
 				Perms: []Permission{PermUserCredit}},
-			{Key: "admin.recharges", Title: "充值订单", Icon: "CreditCard", Path: "/admin/recharges",
+			{Key: "admin.recharges", Title: "充值与兑换码", Icon: "CreditCard", Path: "/admin/recharges",
 				Perms: []Permission{PermRechargeManage}},
 			{Key: "admin.accounts", Title: "GPT账号", Icon: "Connection", Path: "/admin/accounts",
 				Perms: []Permission{PermAccountRead}},

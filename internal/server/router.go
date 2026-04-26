@@ -112,6 +112,8 @@ func New(d *Deps) *gin.Engine {
 					rg.POST("/orders", d.RechargeH.CreateOrder)
 					rg.GET("/orders", d.RechargeH.ListMyOrders)
 					rg.POST("/orders/:id/cancel", d.RechargeH.CancelOrder)
+					rg.GET("/redeem-status", d.RechargeH.RedeemStatus)
+					rg.POST("/redeem", d.RechargeH.Redeem)
 				}
 			}
 
@@ -334,6 +336,9 @@ func New(d *Deps) *gin.Engine {
 					rg.DELETE("/packages/:id", d.AdminRechargeH.DeletePackage)
 					rg.GET("/orders", d.AdminRechargeH.ListOrders)
 					rg.POST("/orders/:id/force-paid", d.AdminRechargeH.ForcePaid)
+					rg.GET("/codes", d.AdminRechargeH.ListRedeemCodes)
+					rg.POST("/codes/batch", d.AdminRechargeH.GenerateRedeemCodes)
+					rg.DELETE("/codes/:id", d.AdminRechargeH.DeleteRedeemCode)
 				}
 			}
 
