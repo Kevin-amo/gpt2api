@@ -19,6 +19,8 @@ const paging = reactive({
 
 const loadingPkg = ref(false)
 const loadingOrder = ref(false)
+const pkgLoaded = ref(false)
+const orderLoaded = ref(false)
 const redeemLoading = ref(false)
 const redeemStatusLoading = ref(false)
 const redeemed = ref(false)
@@ -33,6 +35,7 @@ async function loadPackages() {
     channelEnabled.value = d.enabled
   } finally {
     loadingPkg.value = false
+    pkgLoaded.value = true
   }
 }
 
@@ -48,6 +51,7 @@ async function loadOrders() {
     total.value = d.total
   } finally {
     loadingOrder.value = false
+    orderLoaded.value = true
   }
 }
 
@@ -229,8 +233,26 @@ onMounted(() => {
         <el-tag v-if="!channelEnabled" type="warning" size="small">支付通道未配置</el-tag>
       </div>
 
-      <el-empty v-if="!loadingPkg && packages.length === 0" description="暂无可用套餐"></el-empty>
-      <div v-else class="package-list" v-loading="loadingPkg">
+      <div v-if="loadingPkg && !pkgLoaded" class="package-list skeleton-list">
+        <el-card v-for="n in 3" :key="`pkg-skeleton-${n}`" shadow="hover" class="pkg-card skeleton-card">
+          <el-skeleton animated>
+            <template #template>
+              <div class="skeleton-stack">
+                <el-skeleton-item variant="text" style="width: 42%; height: 18px" />
+                <el-skeleton-item variant="text" style="width: 58%; height: 34px" />
+                <el-skeleton-item variant="text" style="width: 72%; height: 16px" />
+                <el-skeleton-item variant="text" style="width: 100%; height: 14px" />
+                <div class="skeleton-actions">
+                  <el-skeleton-item variant="button" style="width: 92px; height: 36px" />
+                  <el-skeleton-item variant="button" style="width: 92px; height: 36px" />
+                </div>
+              </div>
+            </template>
+          </el-skeleton>
+        </el-card>
+      </div>
+      <el-empty v-else-if="packages.length === 0" description="暂无可用套餐"></el-empty>
+      <div v-else class="package-list">
         <el-card v-for="pkg in packages" :key="pkg.id" shadow="hover" class="pkg-card">
           <div class="pkg-name">{{ pkg.name }}</div>
           <div class="pkg-price">¥ <span>{{ priceYuan(pkg.price_cny) }}</span></div>
@@ -271,8 +293,22 @@ onMounted(() => {
         </div>
       </div>
 
-      <el-empty v-if="!loadingOrder && orders.length === 0" description="暂无订单"></el-empty>
-      <div v-else class="orders-list" v-loading="loadingOrder">
+      <div v-if="loadingOrder && !orderLoaded" class="orders-list skeleton-orders">
+        <div v-for="n in 4" :key="`order-skeleton-${n}`" class="order-item skeleton-order-item">
+          <el-skeleton animated>
+            <template #template>
+              <div class="order-main skeleton-order-main">
+                <div v-for="m in 6" :key="`order-line-${n}-${m}`" class="order-line skeleton-line">
+                  <el-skeleton-item variant="text" style="width: 72px; height: 14px" />
+                  <el-skeleton-item variant="text" :style="m === 1 ? 'width: 56%; height: 16px' : 'width: 34%; height: 16px'" />
+                </div>
+              </div>
+            </template>
+          </el-skeleton>
+        </div>
+      </div>
+      <el-empty v-else-if="orders.length === 0" description="暂无订单"></el-empty>
+      <div v-else class="orders-list">
         <div v-for="order in orders" :key="order.id" class="order-item">
           <div class="order-main">
             <div class="order-line">
@@ -315,6 +351,7 @@ onMounted(() => {
       </div>
 
       <el-pagination
+        v-if="orderLoaded && total > 0"
         style="margin-top: 12px"
         background
         layout="total, prev, pager, next"
@@ -399,11 +436,31 @@ onMounted(() => {
     }
   }
 
-  .pkg-col {
-    margin-bottom: 16px;
+  .package-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
   }
 
-  .pkg-card {
+  .skeleton-list,
+  .skeleton-orders {
+    pointer-events: none;
+  }
+
+  .skeleton-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .skeleton-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .pkg-card,
+  .skeleton-card {
     border-radius: 10px;
     transition: transform .15s;
 
@@ -452,6 +509,61 @@ onMounted(() => {
     }
   }
 
+  .orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .order-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 18px;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 14px;
+    background: var(--el-fill-color-blank);
+  }
+
+  .order-main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px 16px;
+  }
+
+  .order-line {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    span {
+      font-size: 12px;
+      color: var(--el-text-color-secondary);
+    }
+
+    b,
+    code,
+    :deep(.el-tag) {
+      align-self: flex-start;
+    }
+  }
+
+  .skeleton-order-main {
+    width: 100%;
+  }
+
+  .skeleton-line {
+    align-items: flex-start;
+  }
+
+  .order-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
   code {
     padding: 1px 6px;
     border-radius: 4px;
@@ -477,6 +589,14 @@ onMounted(() => {
 
     .redeem-result .result-grid {
       grid-template-columns: 1fr;
+    }
+
+    .order-item {
+      flex-direction: column;
+    }
+
+    .order-actions {
+      justify-content: flex-start;
     }
   }
 }

@@ -1221,10 +1221,22 @@ watch(activeTab, (v) => {
   margin-bottom: 4px;
   .who { font-size: 12px; font-weight: 600; color: var(--el-text-color-secondary); }
   .copy-btn {
-    font-size: 12px; color: var(--el-text-color-placeholder); cursor: pointer;
-    display: inline-flex; align-items: center; gap: 2px;
-    opacity: 0; transition: opacity 0.2s;
-    &:hover { color: var(--el-color-primary); }
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--el-fill-color-light);
+    opacity: 0.78;
+    transition: opacity 0.2s, color 0.2s, background 0.2s;
+    &:hover {
+      color: var(--el-color-primary);
+      background: var(--el-color-primary-light-9);
+      opacity: 1;
+    }
   }
 }
 .msg:hover .copy-btn { opacity: 1; }

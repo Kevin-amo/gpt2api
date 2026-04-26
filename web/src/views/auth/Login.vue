@@ -75,7 +75,6 @@ async function onSubmit() {
 
       <el-card class="form-card" shadow="never">
         <div class="form-title">欢迎回来</div>
-        <div class="form-sub">请使用管理员分配的账号登录</div>
         <el-form
           ref="formRef"
           :model="form"
