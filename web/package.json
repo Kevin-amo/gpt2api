@@ -4,15 +4,6 @@
   "version": "0.1.0",
   "type": "module",
   "description": "gpt2api 控制台前端 · Vue 3 + Element Plus",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/432539/gpt2api.git",
-    "directory": "web"
-  },
-  "homepage": "https://github.com/432539/gpt2api#readme",
-  "bugs": {
-    "url": "https://github.com/432539/gpt2api/issues"
-  },
   "license": "MIT",
   "scripts": {
     "dev": "vite",

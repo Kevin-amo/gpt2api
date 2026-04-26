@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { useUIStore } from '@/stores/ui'
 import { useSiteStore } from '@/stores/site'
-import { brandParts } from '@/utils/brand'
 
 const router = useRouter()
 const user = useUserStore()
@@ -15,10 +14,6 @@ const siteName = computed(() => site.get('site.name', 'GPT2API'))
 const siteLogo = computed(() => site.get('site.logo_url', ''))
 const allowRegister = computed(() => site.allowRegister())
 const loggedIn = computed(() => user.isLoggedIn)
-
-const brand = brandParts()
-const repoHref = `https://${brand.repo}`
-const qqHref = `https://qm.qq.com/q/${brand.qq}`
 
 function goPlay() {
   if (loggedIn.value) router.push('/personal/play')
@@ -70,12 +65,6 @@ const features = [
           <span v-else class="logo-mark">{{ (siteName[0] || 'G').toUpperCase() }}</span>
           <span class="logo-name">{{ siteName }}</span>
         </a>
-        <nav class="menu">
-          <a :href="repoHref" target="_blank" rel="noopener">
-            GitHub <el-icon :size="13" class="ext"><TopRight /></el-icon>
-          </a>
-          <a :href="qqHref" target="_blank" rel="noopener">QQ 群 {{ brand.qq }}</a>
-        </nav>
         <div class="nav-actions">
           <el-button
             link :title="ui.isDark ? '切换到亮色' : '切换到暗色'"
@@ -117,18 +106,6 @@ const features = [
             <el-button size="large" type="primary" round @click="goPlay">
               <el-icon><VideoPlay /></el-icon> 立即体验在线生图
             </el-button>
-            <el-button size="large" round plain tag="a" :href="repoHref" target="_blank">
-              <el-icon><Link /></el-icon> GitHub 仓库
-            </el-button>
-          </div>
-          <div class="hero-meta">
-            <a class="meta-link" :href="qqHref" target="_blank" rel="noopener">
-              <el-icon><Service /></el-icon> {{ brand.qqLabel }}{{ brand.qq }}
-            </a>
-            <span class="dot-sep">·</span>
-            <a class="meta-link" :href="brand.picUrl" target="_blank" rel="noopener">
-              <el-icon><PictureFilled /></el-icon> {{ brand.picLabel }}{{ brand.picText }}
-            </a>
           </div>
         </div>
 
@@ -169,12 +146,6 @@ const features = [
     <footer class="footer">
       <div class="footer-inner">
         <span>© {{ new Date().getFullYear() }} {{ siteName }} · gpt-image-2 终稿直出网关</span>
-        <span class="sep">·</span>
-        <a :href="repoHref" target="_blank" rel="noopener">{{ brand.repoLabel }}{{ brand.repo }}</a>
-        <span class="sep">·</span>
-        <a :href="qqHref" target="_blank" rel="noopener">{{ brand.qqLabel }}{{ brand.qq }}</a>
-        <span class="sep">·</span>
-        <a :href="brand.picUrl" target="_blank" rel="noopener">{{ brand.picLabel }}{{ brand.picText }}</a>
       </div>
     </footer>
   </div>
@@ -273,23 +244,6 @@ const features = [
   }
   .logo-name { font-size: 17px; font-weight: 700; letter-spacing: 0.3px; }
 }
-.menu {
-  display: flex;
-  gap: 22px;
-  flex: 1;
-  a {
-    color: var(--lp-text-soft);
-    font-size: 14px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: color .2s;
-    .ext { opacity: .7; }
-  }
-  a:hover { color: #409eff; }
-}
 .nav-actions {
   display: inline-flex;
   align-items: center;
@@ -366,27 +320,6 @@ const features = [
   gap: 12px;
   margin-bottom: 24px;
 }
-.hero-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--lp-text-mute);
-  .meta-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--lp-text-soft);
-    text-decoration: none;
-    padding: 4px 10px;
-    border-radius: 6px;
-    transition: background .2s;
-  }
-  .meta-link:hover { background: var(--lp-card); color: #409eff; }
-  .dot-sep { color: var(--lp-text-mute); }
-}
-
 .hero-preview {
   position: relative;
   .preview-glow {
@@ -528,7 +461,6 @@ const features = [
   .section { padding: 28px 20px 48px; }
   .nav-inner { gap: 12px; }
   .nav-actions .btn-login { display: none; }
-  .menu { display: none; }
   .hero-cta .el-button { width: 100%; }
   .footer-inner { line-height: 2; }
 }

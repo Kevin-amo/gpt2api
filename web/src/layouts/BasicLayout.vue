@@ -5,7 +5,6 @@ import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/user'
 import { useUIStore } from '@/stores/ui'
 import { useSiteStore } from '@/stores/site'
-import { brandParts } from '@/utils/brand'
 import { APP_VERSION } from '@/version'
 import type { MenuItem } from '@/api/auth'
 
@@ -17,13 +16,8 @@ const route = useRoute()
 
 const siteName = computed(() => site.get('site.name', 'GPT2API'))
 const siteLogo = computed(() => site.get('site.logo_url', ''))
-const siteFooter = computed(() => site.get('site.footer', ''))
 
-const brand = brandParts()
-const brandRepoHref = `https://${brand.repo}`
-const brandQQHref = `https://qm.qq.com/q/${brand.qq}`
-
-const { menu, user, role, permissions } = storeToRefs(store)
+const { menu, user, role } = storeToRefs(store)
 const collapsed = ref(false)      // 桌面端折叠状态
 const drawerOpen = ref(false)     // 移动端抽屉展开状态
 const isMobile = ref(false)
@@ -213,21 +207,6 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
         </router-view>
       </el-main>
 
-      <el-footer class="footer">
-        <div class="footer-line brand-line">
-          <b class="brand-name">{{ brand.brand }}</b>
-          <span class="sep">{{ brand.sep }}</span>
-          <span>{{ brand.qqLabel }}</span>
-          <a :href="brandQQHref" target="_blank" rel="noopener" class="footer-link">{{ brand.qq }}</a>
-          <span class="sep">{{ brand.sep }}</span>
-          <span>{{ brand.repoLabel }}</span>
-          <a :href="brandRepoHref" target="_blank" rel="noopener" class="footer-link">{{ brand.repo }}</a>
-          <span class="sep">{{ brand.sep }}</span>
-          <span>{{ brand.picLabel }}</span>
-          <a :href="brand.picUrl" target="_blank" rel="noopener" class="footer-link pic-link">{{ brand.picText }}</a>
-        </div>
-        <div v-if="siteFooter" class="footer-line footer-custom">{{ siteFooter }}</div>
-      </el-footer>
     </el-container>
   </el-container>
 </template>
@@ -362,38 +341,6 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
   overflow-x: hidden;
 }
 
-// ─── 页脚 ─────────────────────────────────────────────────────────────────────
-.footer {
-  background: transparent;
-  text-align: center;
-  color: var(--el-text-color-secondary);
-  font-size: 12px;
-  padding: 6px 12px;
-  height: auto;
-  min-height: 36px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  flex-shrink: 0;
-}
-.footer-line { line-height: 1.6; }
-.brand-line .brand-name {
-  color: var(--el-color-primary);
-  letter-spacing: 0.5px;
-  margin-right: 4px;
-}
-.brand-line .sep {
-  color: var(--el-text-color-disabled);
-  margin: 0 4px;
-  user-select: none;
-}
-.footer-custom { color: var(--el-text-color-placeholder); font-size: 11px; }
-.footer-link { color: var(--el-color-primary); text-decoration: none; margin: 0 2px; }
-.footer-link.pic-link { color: var(--el-color-success); }
-.footer-link:hover { text-decoration: underline; }
-
 // ─── 过渡 ─────────────────────────────────────────────────────────────────────
 .fade-enter-active, .fade-leave-active { transition: opacity .15s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
@@ -425,6 +372,5 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
     .crumb { font-size: 14px; }
     .nick { display: none; }
   }
-  .footer { display: none; }  // 移动端页脚占空间,隐藏
 }
 </style>
