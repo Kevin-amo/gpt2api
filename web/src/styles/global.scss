@@ -11,12 +11,20 @@
   --gp-text-mute: #9c9488;
   --gp-border: rgba(31, 29, 25, 0.08);
   --gp-border-strong: rgba(31, 29, 25, 0.14);
-  --gp-accent: #8a7a65;
-  --gp-accent-hover: #756653;
-  --gp-accent-soft: rgba(138, 122, 101, 0.12);
-  --gp-sidebar-bg: #1b1916;
-  --gp-sidebar-surface: rgba(255, 255, 255, 0.04);
-  --gp-sidebar-border: rgba(255, 255, 255, 0.08);
+  --gp-accent: #6f5945;
+  --gp-accent-hover: #5c4938;
+  --gp-accent-soft: rgba(111, 89, 69, 0.14);
+  --gp-sidebar-bg: #ede6dd;
+  --gp-sidebar-surface: rgba(111, 89, 69, 0.08);
+  --gp-sidebar-border: rgba(111, 89, 69, 0.14);
+  --gp-sidebar-text: #2f251c;
+  --gp-sidebar-text-soft: #655546;
+  --gp-sidebar-hover-bg: rgba(111, 89, 69, 0.1);
+  --gp-sidebar-active-bg: rgba(111, 89, 69, 0.16);
+  --gp-sidebar-active-text: #1f1812;
+  --gp-sidebar-scrollbar: rgba(111, 89, 69, 0.22);
+  --gp-sidebar-scrollbar-hover: rgba(111, 89, 69, 0.36);
+  --gp-sidebar-version-text: #8b7969;
   --gp-shadow-sm: 0 8px 24px rgba(26, 22, 16, 0.05);
   --gp-shadow-md: 0 20px 48px rgba(26, 22, 16, 0.08);
   --gp-radius-sm: 12px;
@@ -29,13 +37,13 @@
   --gp-space-5: 32px;
   --gp-space-6: 48px;
 
-  --el-color-primary: #8a7a65;
-  --el-color-primary-light-3: #a29482;
-  --el-color-primary-light-5: #bbb0a1;
-  --el-color-primary-light-7: #d7d0c6;
-  --el-color-primary-light-8: #e6e1da;
-  --el-color-primary-light-9: #f2efeb;
-  --el-color-primary-dark-2: #756653;
+  --el-color-primary: #6f5945;
+  --el-color-primary-light-3: #8c7561;
+  --el-color-primary-light-5: #a7907d;
+  --el-color-primary-light-7: #d1c5b7;
+  --el-color-primary-light-8: #e1d8ce;
+  --el-color-primary-light-9: #f1ebe4;
+  --el-color-primary-dark-2: #5c4938;
   --el-bg-color: var(--gp-surface-solid);
   --el-bg-color-page: var(--gp-bg);
   --el-fill-color-light: #f5f1eb;
@@ -67,22 +75,30 @@ html.dark {
   --gp-text-mute: #8a8378;
   --gp-border: rgba(255, 255, 255, 0.08);
   --gp-border-strong: rgba(255, 255, 255, 0.14);
-  --gp-accent: #b29c82;
-  --gp-accent-hover: #c2af98;
-  --gp-accent-soft: rgba(178, 156, 130, 0.16);
-  --gp-sidebar-bg: #11100e;
-  --gp-sidebar-surface: rgba(255, 255, 255, 0.05);
+  --gp-accent: #b89b78;
+  --gp-accent-hover: #ceb295;
+  --gp-accent-soft: rgba(184, 155, 120, 0.18);
+  --gp-sidebar-bg: #1a1713;
+  --gp-sidebar-surface: rgba(255, 255, 255, 0.06);
   --gp-sidebar-border: rgba(255, 255, 255, 0.08);
+  --gp-sidebar-text: #f2e9dd;
+  --gp-sidebar-text-soft: #c8bcaf;
+  --gp-sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+  --gp-sidebar-active-bg: rgba(184, 155, 120, 0.2);
+  --gp-sidebar-active-text: #fffaf3;
+  --gp-sidebar-scrollbar: rgba(255, 255, 255, 0.14);
+  --gp-sidebar-scrollbar-hover: rgba(255, 255, 255, 0.26);
+  --gp-sidebar-version-text: rgba(242, 233, 221, 0.4);
   --gp-shadow-sm: 0 12px 28px rgba(0, 0, 0, 0.22);
   --gp-shadow-md: 0 24px 56px rgba(0, 0, 0, 0.3);
 
-  --el-color-primary: #b29c82;
-  --el-color-primary-light-3: #c2af98;
-  --el-color-primary-light-5: #d0c1b0;
-  --el-color-primary-light-7: #3a342d;
-  --el-color-primary-light-8: #2c2823;
-  --el-color-primary-light-9: #23201c;
-  --el-color-primary-dark-2: #8f7b64;
+  --el-color-primary: #b89b78;
+  --el-color-primary-light-3: #ceb295;
+  --el-color-primary-light-5: #dcc7b1;
+  --el-color-primary-light-7: #3b342c;
+  --el-color-primary-light-8: #2c2722;
+  --el-color-primary-light-9: #231f1b;
+  --el-color-primary-dark-2: #9c8061;
   --el-bg-color: var(--gp-surface-solid);
   --el-bg-color-page: var(--gp-bg);
   --el-fill-color-light: #24211d;
@@ -203,13 +219,24 @@ body {
   height: 42px;
   padding: 0 18px;
   border-radius: 999px !important;
+  border-color: var(--gp-border) !important;
+  background: rgba(255, 255, 255, 0.76) !important;
+  color: var(--gp-text) !important;
   font-weight: 500;
   letter-spacing: 0.01em;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+html.dark .el-button {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: var(--gp-border) !important;
+  color: var(--gp-text) !important;
 }
 
 .el-button:hover {
   transform: translateY(-1px);
+  border-color: var(--gp-border-strong) !important;
+  color: var(--gp-text) !important;
 }
 
 .el-button:active {
@@ -219,24 +246,33 @@ body {
 .el-button--primary {
   border-color: var(--gp-accent) !important;
   background: var(--gp-accent) !important;
-  box-shadow: 0 10px 22px rgba(138, 122, 101, 0.16);
+  color: #fffdf9 !important;
+  box-shadow: 0 10px 22px rgba(111, 89, 69, 0.18);
 }
 
 .el-button--primary:hover {
   border-color: var(--gp-accent-hover) !important;
   background: var(--gp-accent-hover) !important;
-  box-shadow: 0 12px 28px rgba(138, 122, 101, 0.2);
+  color: #fffdf9 !important;
+  box-shadow: 0 12px 28px rgba(111, 89, 69, 0.22);
+}
+
+.el-button--default,
+.el-button--info {
+  color: var(--gp-text) !important;
 }
 
 .el-button.is-link,
 .el-button.is-text {
-  color: var(--gp-text-soft);
+  border-color: transparent !important;
+  background: transparent !important;
+  color: var(--el-button-text-color, var(--gp-text-soft)) !important;
 }
 
 .el-button.is-link:hover,
 .el-button.is-text:hover {
-  color: var(--gp-text);
-  background: var(--gp-accent-soft);
+  color: var(--el-button-hover-text-color, var(--gp-text)) !important;
+  background: var(--el-button-hover-bg-color, var(--gp-accent-soft)) !important;
 }
 
 .el-input__wrapper,
@@ -352,7 +388,7 @@ html.dark *::-webkit-scrollbar-thumb:hover {
 
 .el-aside.sidebar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  scrollbar-color: var(--gp-sidebar-scrollbar) transparent;
 }
 
 .el-aside.sidebar::-webkit-scrollbar {
@@ -361,14 +397,14 @@ html.dark *::-webkit-scrollbar-thumb:hover {
 }
 
 .el-aside.sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--gp-sidebar-scrollbar);
   border-radius: 999px;
   border: 1px solid transparent;
   background-clip: padding-box;
 }
 
 .el-aside.sidebar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.26);
+  background: var(--gp-sidebar-scrollbar-hover);
   background-clip: padding-box;
 }
 

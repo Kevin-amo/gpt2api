@@ -125,8 +125,8 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
         :default-active="activePath"
         :collapse="sideCollapsed"
         background-color="transparent"
-        text-color="#cfd3dc"
-        active-text-color="#ffffff"
+        :text-color="'var(--gp-sidebar-text-soft)'"
+        :active-text-color="'var(--gp-sidebar-active-text)'"
         class="side-menu"
         router
       >
@@ -285,8 +285,8 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
   align-items: center;
   gap: 12px;
   padding: 0 18px;
-  color: #f5efe7;
-  font-weight: 600;
+  color: var(--gp-sidebar-text);
+  font-weight: 700;
   letter-spacing: 0.02em;
   flex-shrink: 0;
 
@@ -296,6 +296,7 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
     border-radius: 12px;
     object-fit: contain;
     background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 6px 16px rgba(31, 25, 19, 0.08);
   }
 
   .mark {
@@ -303,13 +304,14 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
     width: 36px;
     height: 36px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--gp-sidebar-surface);
+    border: 1px solid var(--gp-sidebar-border);
+    color: var(--gp-sidebar-text);
     align-items: center;
     justify-content: center;
     font-size: 14px;
     flex-shrink: 0;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
   }
 
   .title {
@@ -323,25 +325,31 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
 .side-menu {
   border-right: none !important;
   --el-menu-bg-color: transparent;
-  --el-menu-hover-bg-color: rgba(255, 255, 255, 0.06);
+  --el-menu-hover-bg-color: var(--gp-sidebar-hover-bg);
 
   :deep(.el-menu-item),
   :deep(.el-sub-menu__title) {
     height: 44px;
     margin-bottom: 4px;
     border-radius: 12px;
-    color: rgba(245, 239, 231, 0.78);
+    color: var(--gp-sidebar-text-soft);
+    font-weight: 500;
   }
 
   :deep(.el-menu-item:hover),
   :deep(.el-sub-menu__title:hover) {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.06);
+    color: var(--gp-sidebar-text);
+    background: var(--gp-sidebar-hover-bg);
   }
 
   :deep(.el-menu-item.is-active) {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.1);
+    color: var(--gp-sidebar-active-text);
+    background: var(--gp-sidebar-active-bg);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+  }
+
+  :deep(.el-sub-menu.is-active > .el-sub-menu__title) {
+    color: var(--gp-sidebar-text);
   }
 
   :deep(.el-sub-menu .el-menu-item) {
@@ -437,14 +445,14 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
   bottom: 0;
   padding: 12px 16px 16px;
   text-align: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--gp-sidebar-border);
   background: var(--gp-sidebar-bg);
   flex-shrink: 0;
 
   .ver-text {
     display: inline-block;
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--gp-sidebar-version-text);
     letter-spacing: 0.04em;
     user-select: none;
     white-space: nowrap;
