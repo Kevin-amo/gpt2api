@@ -188,15 +188,18 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="card-block redeem-card" v-loading="redeemStatusLoading">
+    <div class="card-block redeem-card">
       <div class="flex-between section-header">
         <div>
           <h3>兑换码兑换</h3>
           <div class="section-hint">每个用户仅可兑换一次，兑换成功后积分立即到账。</div>
         </div>
-        <el-tag :type="redeemed ? 'success' : 'warning'" size="small">
-          {{ redeemed ? '已兑换' : '未兑换' }}
-        </el-tag>
+        <div class="redeem-status-wrap">
+          <span v-if="redeemStatusLoading" class="inline-loading-text">正在加载兑换状态…</span>
+          <el-tag :type="redeemed ? 'success' : 'warning'" size="small">
+            {{ redeemed ? '已兑换' : '未兑换' }}
+          </el-tag>
+        </div>
       </div>
 
       <div class="redeem-panel">
@@ -378,6 +381,20 @@ onMounted(() => {
   .section-hint {
     font-size: 13px;
     color: var(--el-text-color-secondary);
+  }
+
+  .redeem-status-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .inline-loading-text {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    white-space: nowrap;
   }
 
   .balance-card {

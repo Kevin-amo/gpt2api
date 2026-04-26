@@ -199,7 +199,8 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
         </div>
       </el-header>
 
-      <el-main class="main" v-loading="loadingMenu">
+      <el-main class="main">
+        <div v-if="loadingMenu" class="main-loading-hint">正在加载菜单与页面框架…</div>
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />
@@ -428,6 +429,16 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
   padding: 12px 0 0;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.main-loading-hint {
+  margin: 0 12px 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 14px;
+  background: var(--el-fill-color-blank);
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
 }
 
 .fade-enter-active,

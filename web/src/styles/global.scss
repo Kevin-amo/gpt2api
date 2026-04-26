@@ -150,6 +150,17 @@ body {
   background: var(--gp-accent-soft);
 }
 
+.el-loading-mask {
+  display: none !important;
+  pointer-events: none !important;
+  background: transparent !important;
+}
+
+.el-loading-spinner,
+.el-loading-text {
+  display: none !important;
+}
+
 .page-title {
   margin: 0 0 var(--gp-space-4);
   font-size: 18px;
