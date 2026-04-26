@@ -175,7 +175,7 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
           </el-tooltip>
           <el-dropdown trigger="click" @command="(c: string) => c === 'logout' ? logout() : goto(c)">
             <span class="user-entry">
-              <el-avatar :size="28" style="background:#409eff">
+              <el-avatar :size="28" style="background:var(--gp-accent);color:#fff">
                 {{ (user?.nickname || user?.email || 'U').slice(0, 1).toUpperCase() }}
               </el-avatar>
               <span class="nick">{{ user?.nickname || user?.email }}</span>
@@ -212,110 +212,184 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
 </template>
 
 <style scoped lang="scss">
-// ─── 根容器 ──────────────────────────────────────────────────────────────────
-.layout-root { height: 100vh; overflow: hidden; }
+.layout-root {
+  height: 100vh;
+  overflow: hidden;
+  background: var(--gp-bg);
+}
 
-.right-container { min-width: 0; flex: 1; overflow: hidden; }
+.right-container {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  background: transparent;
+}
 
-// ─── 侧栏 ────────────────────────────────────────────────────────────────────
 .sidebar {
-  background: var(--gp-sidebar-bg);
-  transition: width .22s ease;
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 14%),
+    var(--gp-sidebar-bg);
+  border-right: 1px solid var(--gp-sidebar-border);
+  transition: width 0.22s ease;
   overflow-x: hidden;
   display: flex !important;
   flex-direction: column;
+
   .side-menu {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
+    padding: 8px 10px 16px;
   }
 }
 
-// 移动端：侧栏脱离文档流变成 fixed overlay drawer
 .sidebar-mobile {
   position: fixed !important;
   left: 0;
   top: 0;
   height: 100vh;
-  width: 240px !important;  // 覆盖 :width 绑定
+  width: 248px !important;
   z-index: 1001;
   transform: translateX(-100%);
-  transition: transform .25s ease, box-shadow .25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   box-shadow: none;
 }
+
 .sidebar-mobile.sidebar-open {
   transform: translateX(0);
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.24);
 }
 
-// 移动端遮罩
 .sidebar-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.28);
   z-index: 1000;
+  backdrop-filter: blur(2px);
 }
-.overlay-fade-enter-active, .overlay-fade-leave-active { transition: opacity .25s; }
-.overlay-fade-enter-from, .overlay-fade-leave-to { opacity: 0; }
 
-// ─── Logo ─────────────────────────────────────────────────────────────────────
+.overlay-fade-enter-active,
+.overlay-fade-leave-active {
+  transition: opacity 0.25s;
+}
+
+.overlay-fade-enter-from,
+.overlay-fade-leave-to {
+  opacity: 0;
+}
+
 .logo {
-  height: 60px;
+  height: 72px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 16px;
-  color: #fff;
-  font-weight: 700;
-  letter-spacing: 1px;
+  gap: 12px;
+  padding: 0 18px;
+  color: #f5efe7;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   flex-shrink: 0;
+
   .logo-img {
-    width: 32px; height: 32px; border-radius: 8px;
-    object-fit: contain; background: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.92);
   }
+
   .mark {
     display: inline-flex;
-    width: 32px; height: 32px;
-    border-radius: 8px;
-    background: linear-gradient(135deg,#409eff,#67c23a);
-    align-items: center; justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    align-items: center;
+    justify-content: center;
     font-size: 14px;
     flex-shrink: 0;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
-  .title { font-size: 16px; white-space: nowrap; overflow: hidden; }
+
+  .title {
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .side-menu {
   border-right: none !important;
-  --el-menu-hover-bg-color: rgba(255,255,255,0.06);
+  --el-menu-bg-color: transparent;
+  --el-menu-hover-bg-color: rgba(255, 255, 255, 0.06);
+
+  :deep(.el-menu-item),
+  :deep(.el-sub-menu__title) {
+    height: 44px;
+    margin-bottom: 4px;
+    border-radius: 12px;
+    color: rgba(245, 239, 231, 0.78);
+  }
+
+  :deep(.el-menu-item:hover),
+  :deep(.el-sub-menu__title:hover) {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  :deep(.el-menu-item.is-active) {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  :deep(.el-sub-menu .el-menu-item) {
+    min-width: 0;
+  }
 }
 
-// ─── 顶栏 ─────────────────────────────────────────────────────────────────────
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 56px;
-  min-height: 56px;
-  background: var(--el-bg-color);
-  color: var(--el-text-color-primary);
-  border-bottom: 1px solid var(--el-border-color-light);
+  height: 72px;
+  min-height: 72px;
+  margin: 12px 12px 0;
   padding: 0 18px;
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--el-text-color-primary);
+  border: 1px solid var(--gp-border);
+  border-radius: 18px;
+  box-shadow: var(--gp-shadow-sm);
+  backdrop-filter: blur(18px);
   flex-shrink: 0;
-  .left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
   .crumb {
     font-size: 16px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: 0.01em;
   }
+
   .user-entry {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     cursor: pointer;
     color: var(--el-text-color-primary);
+    padding: 6px 8px;
+    border-radius: 999px;
+
     .nick {
       font-size: 14px;
       max-width: 120px;
@@ -324,53 +398,82 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
       white-space: nowrap;
     }
   }
+
   .right {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-shrink: 0;
   }
-  .theme-btn { padding: 0 6px; }
+
+  .theme-btn {
+    padding: 0 6px;
+  }
 }
 
-// ─── 主区 ─────────────────────────────────────────────────────────────────────
+:deep(html.dark) .topbar {
+  background: rgba(28, 25, 22, 0.72);
+}
+
 .main {
-  background: var(--gp-bg);
-  padding: 0;
+  background: transparent;
+  padding: 12px 0 0;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-// ─── 过渡 ─────────────────────────────────────────────────────────────────────
-.fade-enter-active, .fade-leave-active { transition: opacity .15s; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s;
+}
 
-// ─── 版本号 ───────────────────────────────────────────────────────────────────
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .sidebar-version {
   position: sticky;
   bottom: 0;
-  padding: 10px 16px;
+  padding: 12px 16px 16px;
   text-align: center;
-  border-top: 1px solid rgba(255,255,255,0.07);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   background: var(--gp-sidebar-bg);
   flex-shrink: 0;
+
   .ver-text {
     display: inline-block;
     font-size: 11px;
-    color: rgba(255,255,255,0.28);
-    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 0.04em;
     user-select: none;
     white-space: nowrap;
   }
-  &.collapsed .ver-text { font-size: 9px; letter-spacing: 0; }
+
+  &.collapsed .ver-text {
+    font-size: 9px;
+    letter-spacing: 0;
+  }
 }
 
-// ─── 移动端补丁 ───────────────────────────────────────────────────────────────
 @media (max-width: 767px) {
   .topbar {
+    height: 64px;
+    min-height: 64px;
+    margin: 8px 8px 0;
     padding: 0 12px;
-    .crumb { font-size: 14px; }
-    .nick { display: none; }
+
+    .crumb {
+      font-size: 14px;
+    }
+
+    .nick {
+      display: none;
+    }
+  }
+
+  .main {
+    padding-top: 8px;
   }
 }
 </style>

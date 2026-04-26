@@ -180,14 +180,13 @@ function go(p: string) { router.push(p) }
     <div class="hero-card">
       <div class="hero-main">
         <div class="hero-greet">
-          <span class="wave">👋</span>
-          {{ greeting }},{{ user?.nickname || user?.email?.split('@')[0] || '同学' }}
+          {{ greeting }}，{{ user?.nickname || user?.email?.split('@')[0] || '同学' }}
         </div>
         <div class="hero-sub">
-          欢迎回到 <b>暮光 API</b> 控制台 ·
-          当前角色 <el-tag size="small" effect="plain">{{ store.role || '-' }}</el-tag>
-          <span v-if="user?.last_login_at" class="muted">
-            · 上次登录 {{ formatDateTime(user?.last_login_at) }}
+          欢迎回到个人控制台 · 当前角色
+          <el-tag size="small" effect="plain">{{ store.role || '-' }}</el-tag>
+          <span v-if="user?.last_login_at" class="muted hero-meta">
+            上次登录 {{ formatDateTime(user?.last_login_at) }}
           </span>
         </div>
         <div class="hero-actions">

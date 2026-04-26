@@ -1,107 +1,425 @@
 :root {
-  --gp-bg: #f5f7fa;
-  --gp-sidebar-bg: #1f2330;
-  --gp-sidebar-active: #409eff;
-  --gp-card-shadow: 0 1px 4px rgba(0, 21, 41, 0.05);
+  color-scheme: light;
+
+  --gp-bg: #f6f3ee;
+  --gp-bg-soft: #fbf9f6;
+  --gp-surface: rgba(255, 255, 255, 0.92);
+  --gp-surface-solid: #ffffff;
+  --gp-surface-muted: #f2ede6;
+  --gp-text: #1f1d19;
+  --gp-text-soft: #6f685e;
+  --gp-text-mute: #9c9488;
+  --gp-border: rgba(31, 29, 25, 0.08);
+  --gp-border-strong: rgba(31, 29, 25, 0.14);
+  --gp-accent: #8a7a65;
+  --gp-accent-hover: #756653;
+  --gp-accent-soft: rgba(138, 122, 101, 0.12);
+  --gp-sidebar-bg: #1b1916;
+  --gp-sidebar-surface: rgba(255, 255, 255, 0.04);
+  --gp-sidebar-border: rgba(255, 255, 255, 0.08);
+  --gp-shadow-sm: 0 8px 24px rgba(26, 22, 16, 0.05);
+  --gp-shadow-md: 0 20px 48px rgba(26, 22, 16, 0.08);
+  --gp-radius-sm: 12px;
+  --gp-radius-md: 18px;
+  --gp-radius-lg: 24px;
+  --gp-space-1: 8px;
+  --gp-space-2: 12px;
+  --gp-space-3: 16px;
+  --gp-space-4: 24px;
+  --gp-space-5: 32px;
+  --gp-space-6: 48px;
+
+  --el-color-primary: #8a7a65;
+  --el-color-primary-light-3: #a29482;
+  --el-color-primary-light-5: #bbb0a1;
+  --el-color-primary-light-7: #d7d0c6;
+  --el-color-primary-light-8: #e6e1da;
+  --el-color-primary-light-9: #f2efeb;
+  --el-color-primary-dark-2: #756653;
+  --el-bg-color: var(--gp-surface-solid);
+  --el-bg-color-page: var(--gp-bg);
+  --el-fill-color-light: #f5f1eb;
+  --el-fill-color-lighter: #faf7f3;
+  --el-fill-color-blank: rgba(255, 255, 255, 0.78);
+  --el-border-color: rgba(31, 29, 25, 0.1);
+  --el-border-color-light: rgba(31, 29, 25, 0.08);
+  --el-border-color-lighter: rgba(31, 29, 25, 0.06);
+  --el-text-color-primary: var(--gp-text);
+  --el-text-color-regular: #504a42;
+  --el-text-color-secondary: var(--gp-text-soft);
+  --el-text-color-placeholder: var(--gp-text-mute);
+  --el-mask-color: rgba(17, 15, 12, 0.28);
+  --el-border-radius-base: 14px;
+  --el-border-radius-small: 10px;
+  --el-box-shadow-light: var(--gp-shadow-sm);
 }
 
 html.dark {
-  --gp-bg: #0d1117;
-  --gp-sidebar-bg: #0b0e14;
-  --gp-card-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+
+  --gp-bg: #141311;
+  --gp-bg-soft: #181614;
+  --gp-surface: rgba(29, 26, 23, 0.92);
+  --gp-surface-solid: #1c1916;
+  --gp-surface-muted: #23201c;
+  --gp-text: #f1ece4;
+  --gp-text-soft: #b1aa9f;
+  --gp-text-mute: #8a8378;
+  --gp-border: rgba(255, 255, 255, 0.08);
+  --gp-border-strong: rgba(255, 255, 255, 0.14);
+  --gp-accent: #b29c82;
+  --gp-accent-hover: #c2af98;
+  --gp-accent-soft: rgba(178, 156, 130, 0.16);
+  --gp-sidebar-bg: #11100e;
+  --gp-sidebar-surface: rgba(255, 255, 255, 0.05);
+  --gp-sidebar-border: rgba(255, 255, 255, 0.08);
+  --gp-shadow-sm: 0 12px 28px rgba(0, 0, 0, 0.22);
+  --gp-shadow-md: 0 24px 56px rgba(0, 0, 0, 0.3);
+
+  --el-color-primary: #b29c82;
+  --el-color-primary-light-3: #c2af98;
+  --el-color-primary-light-5: #d0c1b0;
+  --el-color-primary-light-7: #3a342d;
+  --el-color-primary-light-8: #2c2823;
+  --el-color-primary-light-9: #23201c;
+  --el-color-primary-dark-2: #8f7b64;
+  --el-bg-color: var(--gp-surface-solid);
+  --el-bg-color-page: var(--gp-bg);
+  --el-fill-color-light: #24211d;
+  --el-fill-color-lighter: #1d1a17;
+  --el-fill-color-blank: rgba(29, 26, 23, 0.92);
+  --el-border-color: rgba(255, 255, 255, 0.1);
+  --el-border-color-light: rgba(255, 255, 255, 0.08);
+  --el-border-color-lighter: rgba(255, 255, 255, 0.06);
+  --el-text-color-primary: var(--gp-text);
+  --el-text-color-regular: #d9d1c7;
+  --el-text-color-secondary: var(--gp-text-soft);
+  --el-text-color-placeholder: var(--gp-text-mute);
+  --el-mask-color: rgba(0, 0, 0, 0.48);
 }
 
-html, body, #app {
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(140, 122, 101, 0.32) transparent;
+}
+
+html,
+body,
+#app {
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
-#app {
+body {
   background: var(--gp-bg);
+  color: var(--gp-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Microsoft YaHei',
+    'Helvetica Neue', Arial, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  background:
+    radial-gradient(circle at top left, rgba(138, 122, 101, 0.06), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(138, 122, 101, 0.04), transparent 30%),
+    var(--gp-bg);
+}
+
+::selection {
+  background: var(--gp-accent-soft);
 }
 
 .page-title {
+  margin: 0 0 var(--gp-space-4);
   font-size: 18px;
   font-weight: 600;
-  margin: 0 0 16px;
-  color: var(--el-text-color-primary);
+  letter-spacing: 0.01em;
+  color: var(--gp-text);
 }
 
 .page-container {
-  padding: 20px;
+  padding: var(--gp-space-5);
 }
 
 .card-block {
-  background: var(--el-bg-color);
-  border-radius: 8px;
-  padding: 18px 20px;
-  box-shadow: var(--gp-card-shadow);
-  + .card-block { margin-top: 16px; }
+  background: var(--gp-surface);
+  border: 1px solid var(--gp-border);
+  border-radius: var(--gp-radius-md);
+  padding: var(--gp-space-4);
+  box-shadow: var(--gp-shadow-sm);
+  backdrop-filter: blur(16px);
+
+  + .card-block {
+    margin-top: var(--gp-space-4);
+  }
 }
 
 .flex-between {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: var(--gp-space-3);
 }
+
 .flex-wrap-gap {
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
   align-items: center;
+  gap: var(--gp-space-3);
 }
 
-// 表格内按钮紧凑
-.el-table .el-button + .el-button { margin-left: 6px; }
-
-// ─── 移动端响应式 ─────────────────────────────────────────────────────────────
-
-// 表格容器:超宽时横向滚动
 .table-wrap {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-// 工具栏(搜索区 + 操作按钮):小屏自动换行
 .toolbar {
   display: flex;
-  align-items: center;
-  gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 16px;
+  align-items: center;
+  gap: var(--gp-space-2);
+  margin-bottom: var(--gp-space-4);
+}
+
+.el-card {
+  border: 1px solid var(--gp-border) !important;
+  border-radius: var(--gp-radius-md) !important;
+  box-shadow: var(--gp-shadow-sm) !important;
+  background: var(--gp-surface) !important;
+  backdrop-filter: blur(16px);
+}
+
+.el-card__body {
+  padding: var(--gp-space-5);
+}
+
+.el-button {
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 999px !important;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.el-button:hover {
+  transform: translateY(-1px);
+}
+
+.el-button:active {
+  transform: translateY(0);
+}
+
+.el-button--primary {
+  border-color: var(--gp-accent) !important;
+  background: var(--gp-accent) !important;
+  box-shadow: 0 10px 22px rgba(138, 122, 101, 0.16);
+}
+
+.el-button--primary:hover {
+  border-color: var(--gp-accent-hover) !important;
+  background: var(--gp-accent-hover) !important;
+  box-shadow: 0 12px 28px rgba(138, 122, 101, 0.2);
+}
+
+.el-button.is-link,
+.el-button.is-text {
+  color: var(--gp-text-soft);
+}
+
+.el-button.is-link:hover,
+.el-button.is-text:hover {
+  color: var(--gp-text);
+  background: var(--gp-accent-soft);
+}
+
+.el-input__wrapper,
+.el-textarea__inner,
+.el-select__wrapper,
+.el-date-editor.el-input__wrapper,
+.el-input-number,
+.el-picker-panel,
+.el-select-dropdown,
+.el-dropdown-menu,
+.el-popover.el-popper {
+  border-color: var(--gp-border) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--gp-shadow-sm) !important;
+}
+
+.el-input__wrapper,
+.el-select__wrapper,
+.el-textarea__inner {
+  background: rgba(255, 255, 255, 0.72) !important;
+}
+
+html.dark .el-input__wrapper,
+html.dark .el-select__wrapper,
+html.dark .el-textarea__inner {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.el-input__wrapper.is-focus,
+.el-select__wrapper.is-focused,
+.el-textarea__inner:focus {
+  box-shadow: 0 0 0 1px var(--gp-accent-soft) !important;
+}
+
+.el-tag {
+  border-radius: 999px;
+  padding: 0 10px;
+}
+
+.el-alert,
+.el-message,
+.el-notification,
+.el-dialog,
+.el-drawer {
+  border-radius: var(--gp-radius-md) !important;
+}
+
+.el-dialog,
+.el-drawer {
+  box-shadow: var(--gp-shadow-md) !important;
+}
+
+.el-table {
+  --el-table-border-color: var(--gp-border);
+  --el-table-header-bg-color: transparent;
+  --el-table-row-hover-bg-color: var(--gp-accent-soft);
+  border-radius: 14px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.el-table th.el-table__cell {
+  font-weight: 600;
+  color: var(--gp-text-soft);
+}
+
+.el-table .el-table__cell {
+  padding: 14px 0;
+}
+
+.el-pagination {
+  margin-top: var(--gp-space-4);
+}
+
+.el-table .el-button + .el-button {
+  margin-left: 6px;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(138, 122, 101, 0.24);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(138, 122, 101, 0.42);
+  background-clip: padding-box;
+}
+
+html.dark * {
+  scrollbar-color: rgba(178, 156, 130, 0.28) transparent;
+}
+
+html.dark *::-webkit-scrollbar-thumb {
+  background: rgba(178, 156, 130, 0.22);
+  background-clip: padding-box;
+}
+
+html.dark *::-webkit-scrollbar-thumb:hover {
+  background: rgba(178, 156, 130, 0.36);
+  background-clip: padding-box;
+}
+
+.el-aside.sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+
+.el-aside.sidebar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.el-aside.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.el-aside.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.26);
+  background-clip: padding-box;
+}
+
+.el-scrollbar__bar {
+  &.is-vertical > .el-scrollbar__thumb,
+  &.is-horizontal > .el-scrollbar__thumb {
+    background-color: rgba(138, 122, 101, 0.36);
+    border-radius: 999px;
+  }
+
+  &.is-vertical {
+    width: 6px;
+  }
+
+  &.is-horizontal {
+    height: 6px;
+  }
+}
+
+html.dark .el-scrollbar__bar {
+  &.is-vertical > .el-scrollbar__thumb,
+  &.is-horizontal > .el-scrollbar__thumb {
+    background-color: rgba(178, 156, 130, 0.3);
+  }
 }
 
 @media (max-width: 767px) {
   .page-container {
-    padding: 12px;
+    padding: var(--gp-space-3);
   }
 
-  .card-block {
-    padding: 14px 12px;
+  .card-block,
+  .el-card__body {
+    padding: var(--gp-space-4);
   }
 
   .page-title {
     font-size: 16px;
-    margin-bottom: 12px;
+    margin-bottom: var(--gp-space-3);
   }
 
-  // 表格横向滚动
   .el-table {
-    overflow-x: auto;
     font-size: 13px;
   }
 
-  // 操作列按钮纵向排列
   .el-table .cell .el-button {
     margin: 2px 0;
     display: block;
     width: 100%;
   }
 
-  // 分页组件紧凑
   .el-pagination {
     justify-content: center;
     flex-wrap: wrap;
@@ -113,13 +431,11 @@ html, body, #app {
     }
   }
 
-  // 对话框全屏化
   .el-dialog {
     width: 95vw !important;
     margin: 4vh auto !important;
   }
 
-  // 表单标签换行
   .el-form-item {
     .el-form-item__label {
       float: none;
@@ -128,106 +444,13 @@ html, body, #app {
       padding-bottom: 4px;
       line-height: 1.4;
     }
+
     .el-form-item__content {
       margin-left: 0 !important;
     }
   }
 
-  // flex-between 在移动端改为换行
   .flex-between {
     flex-wrap: wrap;
-  }
-}
-
-/* ------------------------------------------------------------------
- * 滚动条统一风格
- *
- *  - 全局:细细一条(8px),圆角,半透明灰
- *  - 暗色主题自动加深
- *  - 左侧深色 sidebar 用专属深色滚动条,避免白白一条贴在暗色面板上很突兀
- *  - 覆盖范围:浏览器原生滚动(<main>、el-aside、el-table 等)+
- *            Firefox 的 scrollbar-color / scrollbar-width
- *
- *  注意:Element Plus 的 el-select / el-scrollbar 用的是自绘的 bar,不受这里影响。
- * ------------------------------------------------------------------ */
-
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(144, 147, 153, 0.45) transparent;
-}
-
-/* WebKit / Blink(Chrome / Edge / Safari / Electron) */
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
-*::-webkit-scrollbar-thumb {
-  background: rgba(144, 147, 153, 0.35);
-  border-radius: 999px;
-  border: 2px solid transparent;       /* 做成两侧留白的胶囊 */
-  background-clip: padding-box;
-  transition: background .2s;
-}
-*::-webkit-scrollbar-thumb:hover {
-  background: rgba(144, 147, 153, 0.65);
-  background-clip: padding-box;
-}
-*::-webkit-scrollbar-corner {
-  background: transparent;
-}
-
-/* 深色主题下再加深对比 */
-html.dark {
-  * { scrollbar-color: rgba(255, 255, 255, 0.22) transparent; }
-
-  *::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.18);
-    background-clip: padding-box;
-  }
-  *::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.32);
-    background-clip: padding-box;
-  }
-}
-
-/* 左侧深色 sidebar:scrollbar 要比 body 更暗更隐形 */
-.el-aside.sidebar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.14);
-    border-radius: 999px;
-    border: 1px solid transparent;
-    background-clip: padding-box;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.30);
-    background-clip: padding-box;
-  }
-}
-
-/* Element Plus 自绘滚动条(下拉菜单 / 虚拟滚动)也统一一下粗细和颜色 */
-.el-scrollbar__bar {
-  &.is-vertical > .el-scrollbar__thumb,
-  &.is-horizontal > .el-scrollbar__thumb {
-    background-color: rgba(144, 147, 153, 0.45);
-    border-radius: 999px;
-  }
-  &.is-vertical { width: 6px; }
-  &.is-horizontal { height: 6px; }
-}
-html.dark .el-scrollbar__bar {
-  &.is-vertical > .el-scrollbar__thumb,
-  &.is-horizontal > .el-scrollbar__thumb {
-    background-color: rgba(255, 255, 255, 0.28);
   }
 }

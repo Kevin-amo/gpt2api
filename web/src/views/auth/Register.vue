@@ -58,41 +58,49 @@ async function onSubmit() {
 
 <template>
   <div class="register-page">
-    <el-card class="form-card" shadow="hover">
-      <div class="form-title">创建 {{ siteName }} 账号</div>
-      <div class="form-sub">免费注册,立即体验</div>
-      <el-alert
-        v-if="!allowRegister"
-        type="warning"
-        :closable="false"
-        title="当前站点已关闭自助注册"
-        description="请联系管理员开通账号,或改用已有账号登录。"
-        style="margin-bottom:16px"
-      />
-      <el-form ref="formRef" :model="form" :rules="rules" label-position="top" size="large"
-               :disabled="!allowRegister" @submit.prevent="onSubmit">
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" placeholder="you@example.com" autocomplete="username" />
-        </el-form-item>
-        <el-form-item label="昵称" prop="nickname">
-          <el-input v-model="form.nickname" placeholder="选填" />
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" type="password" show-password autocomplete="new-password" />
-        </el-form-item>
-        <el-form-item label="确认密码" prop="confirm">
-          <el-input v-model="form.confirm" type="password" show-password autocomplete="new-password"
-                    @keyup.enter="onSubmit" />
-        </el-form-item>
-        <el-button type="primary" class="submit" :loading="loading" :disabled="!allowRegister"
-                   @click="onSubmit">
-          注册
-        </el-button>
-        <div class="foot">
-          已有账号?<router-link to="/login">直接登录</router-link>
-        </div>
-      </el-form>
-    </el-card>
+    <div class="auth-shell">
+      <div class="intro-card">
+        <div class="intro-kicker">创建账号</div>
+        <h1>{{ siteName }}</h1>
+        <p>使用一套干净一致的控制台体验，完成注册后即可进入个人中心开始使用。</p>
+      </div>
+
+      <el-card class="form-card" shadow="never">
+        <div class="form-title">创建 {{ siteName }} 账号</div>
+        <div class="form-sub">免费注册，立即体验</div>
+        <el-alert
+          v-if="!allowRegister"
+          type="warning"
+          :closable="false"
+          title="当前站点已关闭自助注册"
+          description="请联系管理员开通账号，或改用已有账号登录。"
+          style="margin-bottom:16px"
+        />
+        <el-form ref="formRef" :model="form" :rules="rules" label-position="top" size="large"
+                 :disabled="!allowRegister" @submit.prevent="onSubmit">
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="form.email" placeholder="you@example.com" autocomplete="username" />
+          </el-form-item>
+          <el-form-item label="昵称" prop="nickname">
+            <el-input v-model="form.nickname" placeholder="选填" />
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="form.password" type="password" show-password autocomplete="new-password" />
+          </el-form-item>
+          <el-form-item label="确认密码" prop="confirm">
+            <el-input v-model="form.confirm" type="password" show-password autocomplete="new-password"
+                      @keyup.enter="onSubmit" />
+          </el-form-item>
+          <el-button type="primary" class="submit" :loading="loading" :disabled="!allowRegister"
+                     @click="onSubmit">
+            注册
+          </el-button>
+          <div class="foot">
+            已有账号?<router-link to="/login">直接登录</router-link>
+          </div>
+        </el-form>
+      </el-card>
+    </div>
   </div>
 </template>
 
@@ -103,22 +111,92 @@ async function onSubmit() {
   align-items: center;
   justify-content: center;
   padding: 40px 24px;
-  box-sizing: border-box;
-  background: linear-gradient(135deg,#eef5ff,#f9fffb);
+  background:
+    radial-gradient(circle at top left, rgba(138, 122, 101, 0.08), transparent 22%),
+    radial-gradient(circle at bottom right, rgba(138, 122, 101, 0.05), transparent 28%),
+    var(--gp-bg);
 }
-:global(html.dark) .register-page {
-  background: linear-gradient(135deg,#0d1117,#0b1f17);
+
+.auth-shell {
+  width: min(960px, 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
+  gap: 32px;
+  align-items: center;
 }
+
+.intro-card {
+  padding: 28px;
+  border: 1px solid var(--gp-border);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow: var(--gp-shadow-sm);
+
+  .intro-kicker {
+    margin-bottom: 12px;
+    color: var(--gp-text-mute);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0 0 12px;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--gp-text);
+  }
+
+  p {
+    margin: 0;
+    color: var(--gp-text-soft);
+    line-height: 1.85;
+  }
+}
+
 .form-card {
   width: 100%;
-  max-width: 400px;
+
+  .form-title {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .form-sub {
+    color: var(--el-text-color-secondary);
+    margin-bottom: 18px;
+    font-size: 13px;
+  }
 }
-.form-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-.form-sub { color: var(--el-text-color-secondary); margin-bottom: 18px; font-size: 13px; }
-.submit { width: 100%; }
-.foot { margin-top: 16px; text-align: center; font-size: 13px; color: var(--el-text-color-secondary); }
+
+.submit {
+  width: 100%;
+}
+
+.foot {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
+}
+
+@media (max-width: 900px) {
+  .register-page {
+    padding: 24px 16px;
+  }
+
+  .auth-shell {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
 
 @media (max-width: 640px) {
-  .register-page { padding: 24px 16px; }
+  .intro-card {
+    display: none;
+  }
 }
 </style>

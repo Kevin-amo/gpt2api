@@ -58,52 +58,55 @@ async function onSubmit() {
 
 <template>
   <div class="login-page">
-    <div class="hero">
-      <div class="brand">
-        <img v-if="siteLogo" :src="siteLogo" class="logo-img" alt="logo" />
-        <div v-else class="mark">{{ (siteName[0] || 'G').toUpperCase() }}</div>
-        <h1>{{ siteName }} 控制台</h1>
-      </div>
-      <p class="tagline">{{ siteDesc }}</p>
-      <ul class="features">
-        <li><el-icon><Lightning /></el-icon> 多账号池 / 多代理池 · IMG2 终稿直出 · 批量出图 · 高并发调度</li>
-        <li><el-icon><Lock /></el-icon> RBAC 权限 · 全链路审计 · 数据库一键备份 / 恢复</li>
-        <li><el-icon><Medal /></el-icon> 积分钱包 · 预扣结算 · 易支付接入 · 用量透明</li>
-      </ul>
-    </div>
-    <el-card class="form-card" shadow="hover">
-      <div class="form-title">欢迎回来</div>
-      <div class="form-sub">请使用管理员分配的账号登录</div>
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        size="large"
-        label-position="top"
-        @submit.prevent="onSubmit"
-      >
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" placeholder="you@example.com" autocomplete="username">
-            <template #prefix><el-icon><Message /></el-icon></template>
-          </el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" type="password" show-password placeholder="至少 6 位"
-                    autocomplete="current-password" @keyup.enter="onSubmit">
-            <template #prefix><el-icon><Lock /></el-icon></template>
-          </el-input>
-        </el-form-item>
-        <el-button type="primary" :loading="loading" class="submit" @click="onSubmit">登录</el-button>
-        <div class="foot">
-          <template v-if="allowRegister">
-            还没有账号?<router-link to="/register">立即注册</router-link>
-          </template>
-          <template v-else>
-            <span class="muted">管理员已关闭自助注册,请联系管理员创建账号</span>
-          </template>
+    <div class="auth-shell">
+      <div class="hero">
+        <div class="brand">
+          <img v-if="siteLogo" :src="siteLogo" class="logo-img" alt="logo" />
+          <div v-else class="mark">{{ (siteName[0] || 'G').toUpperCase() }}</div>
+          <h1>{{ siteName }} 控制台</h1>
         </div>
-      </el-form>
-    </el-card>
+        <p class="tagline">{{ siteDesc }}</p>
+        <ul class="features">
+          <li><el-icon><Lightning /></el-icon> 多账号池 / 多代理池 · IMG2 终稿直出 · 批量出图 · 高并发调度</li>
+          <li><el-icon><Lock /></el-icon> RBAC 权限 · 全链路审计 · 数据库一键备份 / 恢复</li>
+          <li><el-icon><Medal /></el-icon> 积分钱包 · 预扣结算 · 易支付接入 · 用量透明</li>
+        </ul>
+      </div>
+
+      <el-card class="form-card" shadow="never">
+        <div class="form-title">欢迎回来</div>
+        <div class="form-sub">请使用管理员分配的账号登录</div>
+        <el-form
+          ref="formRef"
+          :model="form"
+          :rules="rules"
+          size="large"
+          label-position="top"
+          @submit.prevent="onSubmit"
+        >
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="form.email" placeholder="you@example.com" autocomplete="username">
+              <template #prefix><el-icon><Message /></el-icon></template>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="form.password" type="password" show-password placeholder="至少 6 位"
+                      autocomplete="current-password" @keyup.enter="onSubmit">
+              <template #prefix><el-icon><Lock /></el-icon></template>
+            </el-input>
+          </el-form-item>
+          <el-button type="primary" :loading="loading" class="submit" @click="onSubmit">登录</el-button>
+          <div class="foot">
+            <template v-if="allowRegister">
+              还没有账号?<router-link to="/register">立即注册</router-link>
+            </template>
+            <template v-else>
+              <span class="muted">管理员已关闭自助注册,请联系管理员创建账号</span>
+            </template>
+          </div>
+        </el-form>
+      </el-card>
+    </div>
     <div v-if="siteFooter" class="site-footer">{{ siteFooter }}</div>
   </div>
 </template>
@@ -114,70 +117,168 @@ async function onSubmit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 60px;
   padding: 40px 24px;
-  box-sizing: border-box;
   background:
-    radial-gradient(1000px 400px at 10% 20%, #a5c9ff66, transparent),
-    radial-gradient(800px 400px at 90% 80%, #b1f1b288, transparent),
-    linear-gradient(135deg, #eef5ff, #f9fffb);
+    radial-gradient(circle at top left, rgba(138, 122, 101, 0.08), transparent 22%),
+    radial-gradient(circle at bottom right, rgba(138, 122, 101, 0.05), transparent 28%),
+    var(--gp-bg);
 }
-:global(html.dark) .login-page {
-  background:
-    radial-gradient(1000px 400px at 10% 20%, #1b3a6a99, transparent),
-    radial-gradient(800px 400px at 90% 80%, #1c4c2688, transparent),
-    linear-gradient(135deg, #0d1117, #0b1f17);
+
+.auth-shell {
+  width: min(1040px, 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
+  gap: 32px;
+  align-items: center;
 }
-:global(html.dark) .hero .tagline,
-:global(html.dark) .hero .features { color: #cfd3dc; }
-:global(html.dark) .hero h1 { color: #f2f3f5; }
+
 .hero {
-  flex: 0 1 420px;
-  min-width: 0;
-  max-width: 420px;
-  .brand { display: flex; align-items: center; gap: 14px; }
-  .logo-img { width: 48px; height: 48px; border-radius: 12px; object-fit: contain; background: #fff; }
+  padding: 24px 8px;
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.92);
+  }
+
   .mark {
-    width: 48px; height: 48px; border-radius: 12px;
-    display: inline-flex; align-items: center; justify-content: center;
-    color: #fff; font-weight: 700; font-size: 18px;
-    background: linear-gradient(135deg,#409eff,#67c23a);
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gp-accent);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    box-shadow: 0 10px 24px rgba(138, 122, 101, 0.2);
   }
-  h1 { font-size: 24px; margin: 0; color: #1f2330; }
-  .tagline { color: #606266; margin-top: 6px; }
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--gp-text);
+  }
+
+  .tagline {
+    margin: 18px 0 0;
+    max-width: 520px;
+    color: var(--gp-text-soft);
+    line-height: 1.85;
+  }
+
   .features {
-    list-style: none; padding: 0; margin: 28px 0 0; color: #303133;
-    li { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; font-size: 14px; }
+    list-style: none;
+    margin: 32px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+    color: var(--gp-text);
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 14px 16px;
+      border: 1px solid var(--gp-border);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.42);
+      box-shadow: var(--gp-shadow-sm);
+      line-height: 1.75;
+
+      .el-icon {
+        margin-top: 4px;
+        color: var(--gp-accent);
+      }
+    }
   }
 }
-.site-footer {
-  position: absolute;
-  bottom: 12px; left: 0; right: 0;
-  text-align: center; font-size: 12px; color: #909399;
-}
-.foot .muted { color: #909399; }
+
 .form-card {
-  flex: 0 1 360px;
   width: 100%;
-  max-width: 360px;
-  min-width: 0;
-  .form-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-  .form-sub { color: var(--el-text-color-secondary); margin-bottom: 18px; font-size: 13px; }
-  .submit { width: 100%; margin-top: 4px; }
-  .foot { margin-top: 16px; text-align: center; font-size: 13px; color: var(--el-text-color-secondary); }
+
+  .form-title {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .form-sub {
+    margin-bottom: 22px;
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+  }
+
+  .submit {
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .foot {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+  }
 }
 
-// 平板:图文与表单上下堆叠
+.site-footer {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 12px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--gp-text-mute);
+}
+
+.foot .muted {
+  color: var(--gp-text-mute);
+}
+
 @media (max-width: 960px) {
-  .login-page { gap: 28px; padding: 32px 20px; }
-  .hero { text-align: left; }
+  .login-page {
+    padding: 28px 20px;
+  }
+
+  .auth-shell {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .hero {
+    padding: 0;
+  }
 }
 
-// 手机:隐藏左侧图文,表单占满
 @media (max-width: 640px) {
-  .login-page { padding: 24px 16px; gap: 0; }
-  .hero { display: none; }
-  .form-card { max-width: 100%; }
+  .login-page {
+    padding: 16px;
+  }
+
+  .auth-shell {
+    gap: 16px;
+  }
+
+  .hero {
+    display: none;
+  }
+
+  .site-footer {
+    position: static;
+    margin-top: 16px;
+  }
 }
 </style>
