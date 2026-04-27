@@ -307,7 +307,6 @@ const t2iRatio = ref<string>('1:1')
 const t2iSize = computed(() =>
   RATIOS.find((r) => r.ratio === t2iRatio.value)?.size ?? '1024x1024',
 )
-const t2iN = ref(1)
 // 本地高清放大档位(空=原图 / '2k' / '4k')。
 // 仅在图片代理 URL 首次请求时触发 decode + Catmull-Rom + PNG 编码,
 // 进程内 LRU 缓存命中后毫秒级返回。
@@ -354,7 +353,7 @@ async function sendText2Img() {
       {
         model: selectedImageModel.value,
         prompt,
-        n: t2iN.value,
+        n: 1,
         size: t2iSize.value,
         upscale: t2iUpscale.value || undefined,
       },
@@ -364,7 +363,7 @@ async function sendText2Img() {
     if (t2iResult.value.length === 0) {
       t2iError.value = '未产出图片,请重试或更换描述'
     } else {
-      ElMessage.success(`生成成功,共 ${t2iResult.value.length} 张`)
+      ElMessage.success('生成成功')
     }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err)
@@ -760,13 +759,7 @@ watch(activeTab, (v) => {
             </div>
 
             <div class="side-row">
-              <label class="side-lbl">张数 <span class="side-val">{{ t2iN }}</span></label>
-              <el-slider v-model="t2iN" :min="1" :max="4" show-stops />
-            </div>
-
-            <div class="side-row">
-              <label class="side-lbl">
-                输出尺寸
+              <label class="side-lbl">输出尺寸
                 <el-tooltip placement="top" effect="light">
                   <template #content>
                     <div style="max-width:260px;line-height:1.55;">

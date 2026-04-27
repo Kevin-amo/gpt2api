@@ -146,7 +146,7 @@ func New(d *Deps) *gin.Engine {
 				{
 					pg.POST("/chat", d.GatewayH.ChatCompletions)
 					if d.ImagesH != nil {
-						pg.POST("/image", gateway.PlaygroundImagePreflight(), d.ImagesH.ImageGenerations)
+						pg.POST("/image", gateway.PlaygroundImagePreflight(), gateway.PlaygroundForceSingleImage(), d.ImagesH.ImageGenerations)
 						pg.POST("/image-edit", gateway.PlaygroundImagePreflight(), d.ImagesH.ImageEdits)
 					}
 				}

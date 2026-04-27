@@ -111,11 +111,15 @@ func (h *ImagesHandler) ImageGenerations(c *gin.Context) {
 	if req.Model == "" {
 		req.Model = "gpt-image-2"
 	}
-	if req.N <= 0 {
+	if shouldForceSinglePlaygroundImage(c) {
 		req.N = 1
-	}
-	if req.N > 4 {
-		req.N = 4 // 目前 IMG2 终稿单轮稳定产出 1-4 张,保守上限
+	} else {
+		if req.N <= 0 {
+			req.N = 1
+		}
+		if req.N > 4 {
+			req.N = 4 // 目前 IMG2 终稿单轮稳定产出 1-4 张,保守上限
+		}
 	}
 	if req.Size == "" {
 		req.Size = "1024x1024"

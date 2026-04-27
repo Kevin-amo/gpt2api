@@ -41,6 +41,24 @@ func JWTAsPlaygroundKey(svc *apikey.Service) gin.HandlerFunc {
 	}
 }
 
+// PlaygroundForceSingleImage 仅对在线体验的文生图入口生效。
+// 公开 /v1/images/generations 仍保留多张能力,避免误伤外部 API 客户端。
+func PlaygroundForceSingleImage() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("playground.force_single_image", true)
+		c.Next()
+	}
+}
+
+func shouldForceSinglePlaygroundImage(c *gin.Context) bool {
+	v, ok := c.Get("playground.force_single_image")
+	if !ok {
+		return false
+	}
+	force, _ := v.(bool)
+	return force
+}
+
 // PlaygroundImagePreflight 原先在图生图未实现时用于拦截带 reference_images 的请求。
 // 现在 chatgpt 上游协议已接通(见 upstream/chatgpt/files.go + StreamFConversation 的
 // multimodal_text 支持),这里恢复为 pass-through,仅保留名字避免上层引用破坏。
