@@ -51,7 +51,17 @@ fi
 # ---- step3: 前端 ----
 echo "[build-local] step3 = npm run build (web)"
 pushd web >/dev/null
+NEED_NPM_INSTALL=0
 if [ ! -d node_modules ]; then
+    NEED_NPM_INSTALL=1
+elif [ ! -f node_modules/.package-lock.json ] || [ package-lock.json -nt node_modules/.package-lock.json ]; then
+    NEED_NPM_INSTALL=1
+elif [ ! -d node_modules/dompurify ] || [ ! -d node_modules/@wangeditor/editor ]; then
+    NEED_NPM_INSTALL=1
+fi
+
+if [ "$NEED_NPM_INSTALL" = "1" ]; then
+    echo "[build-local] step3.1 = npm install (web dependencies changed or incomplete)"
     npm install --no-audit --no-fund --loglevel=error
 fi
 npm run build
