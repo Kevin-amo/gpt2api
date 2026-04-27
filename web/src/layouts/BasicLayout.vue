@@ -39,10 +39,19 @@ const noticeReadVersion = ref(0)
 const noticeMutedToday = ref(false)
 
 const MOBILE_BP = 768
+const ANNOUNCEMENT_VISIBLE_PATHS = new Set([
+  '/personal/dashboard',
+  '/personal/keys',
+  '/personal/usage',
+  '/personal/billing',
+  '/personal/play',
+  '/personal/docs',
+])
 
 const activePath = computed(() => route.path)
-const isPersonalDashboard = computed(() => activePath.value === '/personal/dashboard')
-const showAnnouncementButton = computed(() => isPersonalDashboard.value && hasAnnouncement.value)
+const showAnnouncementButton = computed(() => {
+  return ANNOUNCEMENT_VISIBLE_PATHS.has(activePath.value) && hasAnnouncement.value
+})
 const hasUnreadAnnouncement = computed(() => {
   if (!hasAnnouncement.value || noticeVersion.value <= 0) return false
   return noticeReadVersion.value < noticeVersion.value
@@ -349,7 +358,6 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
         <template #header>
           <div class="announcement-dialog-title">
             <span>{{ noticeTitle || '系统公告' }}</span>
-            <el-tag v-if="noticeVersion > 0" size="small" effect="plain">版本 {{ noticeVersion }}</el-tag>
           </div>
         </template>
         <AnnouncementContent :html="noticeHTML" empty-text="暂无公告内容" />
