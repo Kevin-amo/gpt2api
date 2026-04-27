@@ -3,7 +3,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import * as statsApi from '@/api/stats'
-import { formatCredit } from '@/utils/format'
+import { CREDITS_PER_UNIT, formatCredit } from '@/utils/format'
 import { useUserStore } from '@/stores/user'
 import { ENABLE_CHAT_MODEL } from '@/config/feature'
 
@@ -31,11 +31,13 @@ const filteredRows = computed(() =>
 /**
  * 价目说明:
  *   chat  模型: input_price_per_1m / output_price_per_1m / cache_read_price_per_1m
- *              单位"每百万 token 积分(厘)"。展示时换成"每 1M tokens"的积分值。
- *   image 模型: image_price_per_call 每张图积分(厘)。
+ *              后端存储单位是"厘",管理端按"积分"录入和展示。
+ *   image 模型: image_price_per_call 每张图价格,后端存"厘",管理端按"积分"录入和展示。
  */
 function perMillion(c: number) { return formatCredit(c) }
 function perImage(c: number)   { return formatCredit(c) }
+function fromCredits(c: number) { return Number((c / CREDITS_PER_UNIT).toFixed(4)) }
+function toCredits(v: number) { return Math.round((Number(v) || 0) * CREDITS_PER_UNIT) }
 
 // ---------- 新增 / 编辑 ----------
 type EditState = 'create' | 'edit'
@@ -78,10 +80,10 @@ function openEdit(row: statsApi.Model) {
     slug: row.slug,
     type: row.type as 'chat' | 'image',
     upstream_model_slug: row.upstream_model_slug,
-    input_price_per_1m: row.input_price_per_1m,
-    output_price_per_1m: row.output_price_per_1m,
-    cache_read_price_per_1m: row.cache_read_price_per_1m,
-    image_price_per_call: row.image_price_per_call,
+    input_price_per_1m: fromCredits(row.input_price_per_1m),
+    output_price_per_1m: fromCredits(row.output_price_per_1m),
+    cache_read_price_per_1m: fromCredits(row.cache_read_price_per_1m),
+    image_price_per_call: fromCredits(row.image_price_per_call),
     description: row.description,
     enabled: row.enabled,
   })
@@ -97,10 +99,10 @@ async function submit() {
     slug: form.slug,
     type: form.type,
     upstream_model_slug: form.upstream_model_slug,
-    input_price_per_1m: form.input_price_per_1m,
-    output_price_per_1m: form.output_price_per_1m,
-    cache_read_price_per_1m: form.cache_read_price_per_1m,
-    image_price_per_call: form.image_price_per_call,
+    input_price_per_1m: toCredits(form.input_price_per_1m),
+    output_price_per_1m: toCredits(form.output_price_per_1m),
+    cache_read_price_per_1m: toCredits(form.cache_read_price_per_1m),
+    image_price_per_call: toCredits(form.image_price_per_call),
     description: form.description,
     enabled: form.enabled,
   }
@@ -149,7 +151,7 @@ onMounted(load)
         <div>
           <h2 class="page-title" style="margin:0">模型配置</h2>
           <div style="color:var(--el-text-color-secondary);font-size:13px;margin-top:4px">
-            定义对外 slug 与上游模型的映射关系,设置每张图 / 每 1M tokens 的计费倍率;所有价格单位为"积分(厘)",保存后实时生效。
+            定义对外 slug 与上游模型的映射关系,设置每张图 / 每 1M tokens 的计费倍率;列表按积分展示,编辑时也按积分录入,提交时自动换算成后端存储的厘。
           </div>
         </div>
         <div class="flex-wrap-gap">
@@ -259,20 +261,21 @@ onMounted(load)
         </el-form-item>
 
         <template v-if="form.type === 'chat'">
-          <el-form-item label="输入 / 1M tok(厘)">
-            <el-input-number v-model="form.input_price_per_1m" :min="0" :step="1000" style="width:100%" />
+          <el-form-item label="输入 / 1M tok(积分)">
+            <el-input-number v-model="form.input_price_per_1m" :min="0" :step="0.1" :precision="4" style="width:100%" />
           </el-form-item>
-          <el-form-item label="输出 / 1M tok(厘)">
-            <el-input-number v-model="form.output_price_per_1m" :min="0" :step="1000" style="width:100%" />
+          <el-form-item label="输出 / 1M tok(积分)">
+            <el-input-number v-model="form.output_price_per_1m" :min="0" :step="0.1" :precision="4" style="width:100%" />
           </el-form-item>
-          <el-form-item label="缓存读 / 1M tok(厘)">
-            <el-input-number v-model="form.cache_read_price_per_1m" :min="0" :step="1000" style="width:100%" />
-            <div class="hint">可选。0 表示不走缓存计价。</div>
+          <el-form-item label="缓存读 / 1M tok(积分)">
+            <el-input-number v-model="form.cache_read_price_per_1m" :min="0" :step="0.1" :precision="4" style="width:100%" />
+            <div class="hint">可选。0 表示不走缓存计价；这里按积分填写，提交时会自动换算成厘。</div>
           </el-form-item>
         </template>
         <template v-else>
-          <el-form-item label="每张图(厘)">
-            <el-input-number v-model="form.image_price_per_call" :min="0" :step="100" style="width:100%" />
+          <el-form-item label="每张图(积分)">
+            <el-input-number v-model="form.image_price_per_call" :min="0" :step="0.1" :precision="4" style="width:100%" />
+            <div class="hint">例如 10 表示每张图扣 10 积分。</div>
           </el-form-item>
         </template>
 
