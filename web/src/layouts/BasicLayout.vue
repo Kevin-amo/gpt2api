@@ -7,6 +7,12 @@ import { useUIStore } from '@/stores/ui'
 import { useSiteStore } from '@/stores/site'
 import { APP_VERSION } from '@/version'
 import type { MenuItem } from '@/api/auth'
+import AnnouncementContent from '@/components/AnnouncementContent.vue'
+
+const SITE_ANNOUNCEMENT_TITLE = 'site.announcement_title'
+const SITE_ANNOUNCEMENT_HTML = 'site.announcement_html'
+const SITE_ANNOUNCEMENT_POPUP_ENABLED = 'site.announcement_popup_enabled'
+const SITE_ANNOUNCEMENT_VERSION = 'site.announcement_version'
 
 const store = useUserStore()
 const ui = useUIStore()
@@ -14,26 +20,46 @@ const site = useSiteStore()
 const router = useRouter()
 const route = useRoute()
 
-const siteName = computed(() => site.get('site.name', 'GPT2API'))
+const siteName = computed(() => site.siteName)
 const siteLogo = computed(() => site.get('site.logo_url', ''))
+const noticeTitle = computed(() => site.get(SITE_ANNOUNCEMENT_TITLE, '系统公告'))
+const noticeHTML = computed(() => site.get(SITE_ANNOUNCEMENT_HTML, ''))
+const noticePopupEnabled = computed(() => site.getBool(SITE_ANNOUNCEMENT_POPUP_ENABLED, false))
+const noticeVersion = computed(() => Number(site.get(SITE_ANNOUNCEMENT_VERSION, '0')) || 0)
+const hasAnnouncement = computed(() => !!(noticeTitle.value.trim() || noticeHTML.value.trim()))
 
 const { menu, user, role } = storeToRefs(store)
-const collapsed = ref(false)      // 桌面端折叠状态
-const drawerOpen = ref(false)     // 移动端抽屉展开状态
+const collapsed = ref(false)
+const drawerOpen = ref(false)
 const isMobile = ref(false)
 const loadingMenu = ref(false)
+const noticeDialogVisible = ref(false)
+const noticeMuteToday = ref(false)
+const noticeReadVersion = ref(0)
+const noticeMutedToday = ref(false)
 
 const MOBILE_BP = 768
+
+const activePath = computed(() => route.path)
+const isPersonalDashboard = computed(() => activePath.value === '/personal/dashboard')
+const showAnnouncementButton = computed(() => isPersonalDashboard.value && hasAnnouncement.value)
+const hasUnreadAnnouncement = computed(() => {
+  if (!hasAnnouncement.value || noticeVersion.value <= 0) return false
+  return noticeReadVersion.value < noticeVersion.value
+})
+const noticeUserKey = computed(() => String(user.value?.id || 0))
+const noticeReadStorageKey = computed(() => `gpt2api.notice.read.${noticeUserKey.value}`)
+const noticeMuteStorageKey = computed(() => `gpt2api.notice.mute.${noticeUserKey.value}`)
+const noticeAutoShownSessionKey = computed(() => `gpt2api.notice.auto.${noticeUserKey.value}.${noticeVersion.value}`)
 
 function checkMobile() {
   const mobile = window.innerWidth < MOBILE_BP
   if (mobile !== isMobile.value) {
     isMobile.value = mobile
-    if (!mobile) drawerOpen.value = false  // 切换到桌面时自动关抽屉
+    if (!mobile) drawerOpen.value = false
   }
 }
 
-// 顶栏汉堡按钮行为:移动端控制抽屉,桌面端控制折叠
 function toggleSidebar() {
   if (isMobile.value) {
     drawerOpen.value = !drawerOpen.value
@@ -42,19 +68,12 @@ function toggleSidebar() {
   }
 }
 
-// 侧栏图标:移动端始终用 Menu 图标,桌面端跟随折叠状态
 const menuIcon = computed(() => {
   if (isMobile.value) return 'Menu'
   return collapsed.value ? 'Expand' : 'Fold'
 })
-
-// 侧栏实际是否折叠(移动端抽屉展开时不折叠)
 const sideCollapsed = computed(() => isMobile.value ? false : collapsed.value)
-
-// 侧栏宽度(桌面端动态;移动端固定 240px 由 CSS 管理)
 const asideWidth = computed(() => isMobile.value ? '0px' : (collapsed.value ? '64px' : '220px'))
-
-const activePath = computed(() => route.path)
 
 const titleMap = computed(() => {
   const m = new Map<string, string>()
@@ -89,15 +108,120 @@ function goto(path?: string) {
   if (path) router.push(path)
 }
 
-// 路由切换时关闭移动端抽屉
+function todayToken() {
+  const now = new Date()
+  const y = now.getFullYear()
+  const m = String(now.getMonth() + 1).padStart(2, '0')
+  const d = String(now.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+function readStorageInt(key: string): number {
+  const raw = localStorage.getItem(key)
+  const n = Number(raw || 0)
+  return Number.isFinite(n) ? n : 0
+}
+
+function parseMuteRecord(raw: string | null): { version: number; date: string } | null {
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw)
+    if (typeof parsed?.version === 'number' && typeof parsed?.date === 'string') {
+      return parsed as { version: number; date: string }
+    }
+  } catch {
+    return null
+  }
+  return null
+}
+
+function syncAnnouncementState() {
+  noticeReadVersion.value = readStorageInt(noticeReadStorageKey.value)
+  const record = parseMuteRecord(localStorage.getItem(noticeMuteStorageKey.value))
+  noticeMutedToday.value = !!record
+    && record.version === noticeVersion.value
+    && record.date === todayToken()
+  if (!noticeDialogVisible.value) {
+    noticeMuteToday.value = noticeMutedToday.value
+  }
+}
+
+function markAnnouncementRead() {
+  if (noticeVersion.value <= 0) return
+  localStorage.setItem(noticeReadStorageKey.value, String(noticeVersion.value))
+  noticeReadVersion.value = noticeVersion.value
+}
+
+function applyMutePreference() {
+  const record = parseMuteRecord(localStorage.getItem(noticeMuteStorageKey.value))
+  if (noticeMuteToday.value && noticeVersion.value > 0) {
+    localStorage.setItem(noticeMuteStorageKey.value, JSON.stringify({
+      version: noticeVersion.value,
+      date: todayToken(),
+    }))
+  } else if (!record || record.version === noticeVersion.value) {
+    localStorage.removeItem(noticeMuteStorageKey.value)
+  }
+  syncAnnouncementState()
+}
+
+function sessionAlreadyAutoShown() {
+  return sessionStorage.getItem(noticeAutoShownSessionKey.value) === '1'
+}
+
+function openAnnouncement(auto = false) {
+  if (!hasAnnouncement.value) return
+  syncAnnouncementState()
+  noticeDialogVisible.value = true
+  markAnnouncementRead()
+  if (auto) {
+    sessionStorage.setItem(noticeAutoShownSessionKey.value, '1')
+  }
+}
+
+function maybeAutoOpenAnnouncement() {
+  syncAnnouncementState()
+  if (!site.loaded || !showAnnouncementButton.value || !noticePopupEnabled.value) return
+  if (!hasUnreadAnnouncement.value || noticeMutedToday.value || sessionAlreadyAutoShown()) return
+  openAnnouncement(true)
+}
+
 watch(() => route.path, () => {
   if (isMobile.value) drawerOpen.value = false
+})
+
+watch(
+  [
+    () => route.path,
+    () => user.value?.id,
+    () => site.loaded,
+    noticeVersion,
+    noticeTitle,
+    noticeHTML,
+  ],
+  () => {
+    syncAnnouncementState()
+    maybeAutoOpenAnnouncement()
+  },
+  { immediate: true },
+)
+
+watch(noticeDialogVisible, (open, wasOpen) => {
+  if (open) {
+    syncAnnouncementState()
+    markAnnouncementRead()
+    return
+  }
+  if (wasOpen) {
+    applyMutePreference()
+  }
 })
 
 onMounted(() => {
   checkMobile()
   window.addEventListener('resize', checkMobile)
   loadMenu()
+  syncAnnouncementState()
 })
 onUnmounted(() => window.removeEventListener('resize', checkMobile))
 watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
@@ -166,6 +290,13 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
           <span class="crumb">{{ currentTitle }}</span>
         </div>
         <div class="right">
+          <el-tooltip v-if="showAnnouncementButton" content="查看公告" placement="bottom">
+            <el-badge :is-dot="hasUnreadAnnouncement" class="notice-badge">
+              <el-button link class="theme-btn notice-btn" @click="openAnnouncement()">
+                <el-icon :size="18"><Bell /></el-icon>
+              </el-button>
+            </el-badge>
+          </el-tooltip>
           <el-tooltip :content="ui.isDark ? '切换到亮色' : '切换到暗色'" placement="bottom">
             <el-button link class="theme-btn" @click="ui.toggleDark()">
               <el-icon :size="18">
@@ -207,6 +338,28 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
           </transition>
         </router-view>
       </el-main>
+
+      <el-dialog
+        v-model="noticeDialogVisible"
+        title="系统公告"
+        width="720px"
+        top="10vh"
+        class="announcement-dialog"
+      >
+        <template #header>
+          <div class="announcement-dialog-title">
+            <span>{{ noticeTitle || '系统公告' }}</span>
+            <el-tag v-if="noticeVersion > 0" size="small" effect="plain">版本 {{ noticeVersion }}</el-tag>
+          </div>
+        </template>
+        <AnnouncementContent :html="noticeHTML" empty-text="暂无公告内容" />
+        <template #footer>
+          <div class="announcement-dialog-footer">
+            <el-checkbox v-model="noticeMuteToday">今日不再提醒</el-checkbox>
+            <el-button @click="noticeDialogVisible = false">关闭</el-button>
+          </div>
+        </template>
+      </el-dialog>
 
     </el-container>
   </el-container>
@@ -415,6 +568,16 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
     flex-shrink: 0;
   }
 
+  .notice-badge {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .notice-badge :deep(.el-badge__content) {
+    border: 0;
+    box-shadow: none;
+  }
+
   .theme-btn {
     padding: 0 6px;
   }
@@ -439,6 +602,23 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
   background: var(--el-fill-color-blank);
   color: var(--el-text-color-secondary);
   font-size: 13px;
+}
+
+:deep(.announcement-dialog .el-dialog) {
+  max-width: calc(100vw - 24px);
+  border-radius: 22px;
+}
+
+:deep(.announcement-dialog .el-dialog__body) {
+  padding-top: 8px;
+}
+
+.announcement-dialog-title,
+.announcement-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .fade-enter-active,
@@ -489,6 +669,11 @@ watch(() => store.isLoggedIn, (v) => { if (v) loadMenu() })
     .nick {
       display: none;
     }
+  }
+
+  .announcement-dialog-footer {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .main {

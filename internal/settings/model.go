@@ -31,8 +31,12 @@ const (
 	SiteLogoURL      = "site.logo_url"
 	SiteFooter       = "site.footer"
 	SiteContactEmail = "site.contact_email"
-	SiteDocsURL      = "site.docs_url"
-	SiteAPIBaseURL   = "site.api_base_url"
+	SiteDocsURL       = "site.docs_url"
+	SiteAPIBaseURL    = "site.api_base_url"
+	SiteAnnouncementTitle = "site.announcement_title"
+	SiteAnnouncementHTML  = "site.announcement_html"
+	SiteAnnouncementPopupEnabled = "site.announcement_popup_enabled"
+	SiteAnnouncementVersion = "site.announcement_version"
 	UIDefaultPageSize = "ui.default_page_size"
 
 	// 安全与认证
@@ -102,6 +106,10 @@ var Defs = []KeyDef{
 	{Key: SiteContactEmail, Type: "email", Category: "site", Default: "", Label: "联系邮箱", Desc: "对外展示的客服邮箱", Public: true},
 	{Key: SiteDocsURL, Type: "url", Category: "site", Default: "", Label: "文档链接", Desc: "留空则前端隐藏「文档」入口", Public: true},
 	{Key: SiteAPIBaseURL, Type: "url", Category: "site", Default: "", Label: "API Base URL", Desc: "展示给用户的 /v1 入口;留空=当前站点地址", Public: true},
+	{Key: SiteAnnouncementTitle, Type: "string", Category: "site", Default: "", Label: "公告标题", Desc: "展示在用户总览弹窗和公告按钮中", Public: true},
+	{Key: SiteAnnouncementHTML, Type: "html", Category: "site", Default: "", Label: "公告内容 HTML", Desc: "支持富文本编辑和 HTML 渲染", Public: true},
+	{Key: SiteAnnouncementPopupEnabled, Type: "bool", Category: "site", Default: "false", Label: "自动弹窗", Desc: "开启后用户进入总览页可自动弹出公告", Public: true},
+	{Key: SiteAnnouncementVersion, Type: "int", Category: "site", Default: "0", Label: "公告版本", Desc: "用于前端红点和“今日不再提醒”状态隔离", Public: true},
 	{Key: UIDefaultPageSize, Type: "int", Category: "site", Default: "20", Label: "默认每页条数", Desc: "后台表格默认分页(5~100)"},
 
 	// ---------- 安全与认证 ----------

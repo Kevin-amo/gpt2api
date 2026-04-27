@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { fetchSiteInfo } from '@/api/settings'
 
 /**
  * Site store 缓存站点公开信息:
  *   site.name / site.description / site.logo_url / site.footer / site.contact_email
+ *   site.announcement_title / site.announcement_html / site.announcement_popup_enabled / site.announcement_version
  *   auth.allow_register   — 用于登录/注册页判定是否展示注册入口
  *
  * 页面启动时 refresh() 一次即可;管理员改完设置会再触发一次 refresh。
@@ -17,9 +18,15 @@ export const useSiteStore = defineStore('site', () => {
     'site.logo_url': '',
     'site.footer': '',
     'site.contact_email': '',
+    'site.announcement_title': '',
+    'site.announcement_html': '',
+    'site.announcement_popup_enabled': 'false',
+    'site.announcement_version': '0',
     'auth.allow_register': 'true',
   })
   const loaded = ref(false)
+
+  const siteName = computed(() => info.value['site.name'] || 'GPT2API')
 
   async function refresh() {
     try {
@@ -35,8 +42,7 @@ export const useSiteStore = defineStore('site', () => {
   }
 
   function applyDocumentTitle() {
-    const n = info.value['site.name'] || 'GPT2API'
-    document.title = `${n} 控制台`
+    document.title = `${siteName.value} 控制台`
   }
 
   function applyFavicon() {
@@ -55,10 +61,13 @@ export const useSiteStore = defineStore('site', () => {
     const v = info.value[key]
     return v == null || v === '' ? fallback : v
   }
+  function getBool(key: string, fallback = false): boolean {
+    const raw = get(key, fallback ? 'true' : 'false').toLowerCase()
+    return raw === 'true' || raw === '1' || raw === 'yes' || raw === 'on'
+  }
   function allowRegister(): boolean {
-    const v = (info.value['auth.allow_register'] || '').toLowerCase()
-    return v === 'true' || v === '1' || v === 'yes'
+    return getBool('auth.allow_register', true)
   }
 
-  return { info, loaded, refresh, get, allowRegister }
+  return { info, loaded, refresh, get, getBool, allowRegister, siteName }
 })

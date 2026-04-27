@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, reactive, onMounted } from 'vue'
+import { ref, computed, reactive, onMounted, onBeforeUnmount, shallowRef } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   Refresh,
@@ -19,12 +19,51 @@ import {
   type SettingItem,
 } from '@/api/settings'
 import { useSiteStore } from '@/stores/site'
+import AnnouncementContent from '@/components/AnnouncementContent.vue'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor'
+import '@wangeditor/editor/dist/css/style.css'
+
+const SITE_ANNOUNCEMENT_TITLE = 'site.announcement_title'
+const SITE_ANNOUNCEMENT_HTML = 'site.announcement_html'
+const SITE_ANNOUNCEMENT_POPUP_ENABLED = 'site.announcement_popup_enabled'
+const SITE_ANNOUNCEMENT_VERSION = 'site.announcement_version'
+const announcementKeys = new Set<string>([
+  SITE_ANNOUNCEMENT_TITLE,
+  SITE_ANNOUNCEMENT_HTML,
+  SITE_ANNOUNCEMENT_POPUP_ENABLED,
+  SITE_ANNOUNCEMENT_VERSION,
+])
 
 const loading = ref(false)
 const saving = ref(false)
 const items = ref<SettingItem[]>([])
-// 本地编辑态,key -> value(string)
 const draft = reactive<Record<string, string>>({})
+const announcementEditorRef = shallowRef<IDomEditor | null>(null)
+
+const toolbarConfig: Partial<IToolbarConfig> = {
+  toolbarKeys: [
+    'headerSelect',
+    'bold',
+    'italic',
+    'underline',
+    'through',
+    'color',
+    'bgColor',
+    'bulletedList',
+    'numberedList',
+    'blockquote',
+    'insertLink',
+    'codeBlock',
+    'undo',
+    'redo',
+  ],
+}
+const editorConfig: Partial<IEditorConfig> = {
+  placeholder: '请输入公告内容，支持 HTML 富文本展示',
+  scroll: false,
+  autoFocus: false,
+}
 
 const tabs = [
   { name: 'site', label: '通用设置', icon: Setting },
@@ -41,13 +80,27 @@ const grouped = computed(() => {
     site: [], auth: [], defaults: [], gateway: [], billing: [], mail: [],
   }
   for (const it of items.value) {
-    // 旧 category "limit" 归并到 defaults 显示
     const cat = it.category === 'limit' ? 'defaults' : it.category
     ;(map[cat] ||= []).push(it)
   }
   for (const k of Object.keys(map)) map[k].sort((a, b) => a.key.localeCompare(b.key))
   return map
 })
+
+const hasAnnouncementSection = computed(() => items.value.some((it) => announcementKeys.has(it.key)))
+const announcementTitle = computed({
+  get: () => draft[SITE_ANNOUNCEMENT_TITLE] ?? '',
+  set: (value: string) => { draft[SITE_ANNOUNCEMENT_TITLE] = value ?? '' },
+})
+const announcementHTML = computed({
+  get: () => draft[SITE_ANNOUNCEMENT_HTML] ?? '',
+  set: (value: string) => { draft[SITE_ANNOUNCEMENT_HTML] = value ?? '' },
+})
+const announcementPopupEnabled = computed({
+  get: () => draft[SITE_ANNOUNCEMENT_POPUP_ENABLED] === 'true',
+  set: (value: boolean) => { draft[SITE_ANNOUNCEMENT_POPUP_ENABLED] = value ? 'true' : 'false' },
+})
+const announcementVersion = computed(() => draft[SITE_ANNOUNCEMENT_VERSION] || '0')
 
 const dirtyCount = computed(() => {
   let n = 0
@@ -81,6 +134,13 @@ function inputType(it: SettingItem) {
   if (it.type === 'url') return 'url'
   return 'text'
 }
+function isAnnouncementField(it: SettingItem) { return announcementKeys.has(it.key) }
+function visibleItems(tabName: (typeof tabs)[number]['name']) {
+  return (grouped.value[tabName] || []).filter((it) => !(tabName === 'site' && isAnnouncementField(it)))
+}
+function onEditorCreated(editor: IDomEditor) {
+  announcementEditorRef.value = editor
+}
 
 async function save() {
   const diff: Record<string, string> = {}
@@ -97,7 +157,7 @@ async function save() {
     await updateSettings(diff)
     ElMessage.success(`已保存 ${Object.keys(diff).length} 项`)
     await load()
-    useSiteStore().refresh()
+    await useSiteStore().refresh()
   } finally {
     saving.value = false
   }
@@ -114,7 +174,6 @@ async function doReload() {
   } catch { /* 拦截器已处理 */ }
 }
 
-// ---- 邮件测试 ----
 const mailDlg = ref(false)
 const mailTo = ref('')
 const mailSending = ref(false)
@@ -134,12 +193,12 @@ async function submitTestMail() {
 }
 
 onMounted(load)
+onBeforeUnmount(() => announcementEditorRef.value?.destroy())
 </script>
 
 <template>
   <div class="page-container">
     <div class="card-block" v-loading="loading">
-      <!-- 顶部:标题 + 操作栏(始终可见) -->
       <div class="flex-between settings-head">
         <div>
           <div class="page-title" style="margin:0">系统设置</div>
@@ -182,8 +241,62 @@ onMounted(load)
               label-position="right"
               class="setting-form"
             >
+              <el-form-item v-if="t.name === 'site' && hasAnnouncementSection" label="公告管理">
+                <div class="announcement-panel">
+                  <div class="announcement-panel-head">
+                    <div>
+                      <div class="announcement-panel-title">用户总览公告</div>
+                      <div class="hint">保存后会同步到用户总览页的公告按钮与弹窗。</div>
+                    </div>
+                    <el-tag effect="plain" size="small">版本 {{ announcementVersion }}</el-tag>
+                  </div>
+
+                  <el-input
+                    v-model="announcementTitle"
+                    placeholder="请输入公告标题"
+                    clearable
+                    maxlength="80"
+                    show-word-limit
+                    class="announcement-title-input"
+                  />
+
+                  <div class="announcement-toolbar-card">
+                    <Toolbar
+                      v-if="announcementEditorRef"
+                      :editor="announcementEditorRef"
+                      :default-config="toolbarConfig"
+                      mode="default"
+                    />
+                    <Editor
+                      v-model="announcementHTML"
+                      :default-config="editorConfig"
+                      mode="default"
+                      class="announcement-editor"
+                      @onCreated="onEditorCreated"
+                    />
+                  </div>
+
+                  <div class="announcement-options">
+                    <el-switch v-model="announcementPopupEnabled" />
+                    <div>
+                      <div class="announcement-option-title">自动弹窗</div>
+                      <div class="hint">开启后，用户进入“个人总览”时会自动看到公告；关闭后仅保留手动查看按钮。</div>
+                    </div>
+                  </div>
+
+                  <div class="announcement-preview-card">
+                    <div class="announcement-preview-head">
+                      <span>前台预览</span>
+                      <el-tag size="small" effect="plain">{{ announcementPopupEnabled ? '自动弹窗开启' : '仅按钮查看' }}</el-tag>
+                    </div>
+                    <div v-if="announcementTitle" class="announcement-preview-title">{{ announcementTitle }}</div>
+                    <AnnouncementContent :html="announcementHTML" empty-text="暂无公告内容" />
+                  </div>
+                </div>
+              </el-form-item>
+
               <el-form-item
-                v-for="it in grouped[t.name]"
+                v-for="it in visibleItems(t.name)"
                 :key="it.key"
                 :label="it.label || it.key"
               >
@@ -229,7 +342,6 @@ onMounted(load)
       </el-tabs>
     </div>
 
-    <!-- 测试邮件 -->
     <el-dialog v-model="mailDlg" title="发送 SMTP 测试邮件" width="420px">
       <el-form label-width="80px">
         <el-form-item label="收件人">
@@ -285,11 +397,80 @@ onMounted(load)
   line-height: 1.5;
 }
 
+.announcement-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.announcement-panel-head,
+.announcement-options,
+.announcement-preview-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.announcement-panel-head {
+  align-items: center;
+}
+.announcement-panel-title,
+.announcement-option-title {
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+}
+.announcement-toolbar-card,
+.announcement-preview-card {
+  border: 1px solid var(--el-border-color);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--el-bg-color);
+}
+.announcement-toolbar-card :deep(.w-e-toolbar) {
+  border: 0;
+  border-bottom: 1px solid var(--el-border-color);
+  background: var(--el-fill-color-lighter);
+}
+.announcement-toolbar-card :deep(.w-e-bar-item button) {
+  color: var(--el-text-color-primary);
+}
+.announcement-toolbar-card :deep(.w-e-text-container) {
+  background: transparent;
+}
+.announcement-editor {
+  min-height: 280px;
+}
+.announcement-editor :deep(.w-e-text-container [data-slate-editor]) {
+  min-height: 240px;
+  padding: 14px;
+}
+.announcement-options {
+  align-items: flex-start;
+}
+.announcement-preview-card {
+  padding: 16px;
+}
+.announcement-preview-head {
+  align-items: center;
+  margin-bottom: 12px;
+}
+.announcement-preview-title {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+}
+
 @media (max-width: 640px) {
   .setting-form :deep(.el-form-item__label) {
     width: auto !important;
     padding-right: 8px !important;
     line-height: 1.5;
+  }
+  .announcement-panel-head,
+  .announcement-options,
+  .announcement-preview-head {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>

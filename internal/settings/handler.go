@@ -1,6 +1,9 @@
 package settings
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/432539/gpt2api/internal/audit"
@@ -60,6 +63,10 @@ func (h *Handler) Update(c *gin.Context) {
 		resp.BadRequest(c, "items required")
 		return
 	}
+	current := h.svc.Snapshot()
+	if announcementChanged(current, req.Items) {
+		req.Items[SiteAnnouncementVersion] = strconv.FormatInt(time.Now().UnixMilli(), 10)
+	}
 	// 白名单过滤 + 类型轻校验(严重错误直接拒,warning 放行由前端提示)
 	for k, v := range req.Items {
 		if !IsAllowedKey(k) {
@@ -96,6 +103,15 @@ func (h *Handler) Update(c *gin.Context) {
 		}
 	}
 	resp.OK(c, gin.H{"updated": len(req.Items)})
+}
+
+func announcementChanged(current map[string]string, incoming map[string]string) bool {
+	for _, key := range []string{SiteAnnouncementTitle, SiteAnnouncementHTML} {
+		if next, ok := incoming[key]; ok && next != current[key] {
+			return true
+		}
+	}
+	return false
 }
 
 // Reload POST /api/admin/settings/reload
