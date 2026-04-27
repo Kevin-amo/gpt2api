@@ -20,13 +20,13 @@ func (h *Handler) RedeemStatus(c *gin.Context) {
 	row, err := h.svc.GetMyRedeemStatus(c.Request.Context(), uid)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
-			resp.OK(c, gin.H{"redeemed": false})
+			resp.OK(c, gin.H{"record": nil})
 			return
 		}
 		resp.Internal(c, err.Error())
 		return
 	}
-	resp.OK(c, gin.H{"redeemed": true, "record": row})
+	resp.OK(c, gin.H{"record": row})
 }
 
 // POST /api/recharge/redeem
@@ -50,8 +50,6 @@ func (h *Handler) Redeem(c *gin.Context) {
 			resp.BadRequest(c, "兑换码不存在或已失效")
 		case errors.Is(err, ErrRedeemCodeUsed):
 			resp.Conflict(c, "兑换码已被使用")
-		case errors.Is(err, ErrRedeemLimitReached):
-			resp.Conflict(c, "每个用户仅可兑换一次")
 		default:
 			resp.Internal(c, err.Error())
 		}

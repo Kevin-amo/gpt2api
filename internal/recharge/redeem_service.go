@@ -16,7 +16,6 @@ import (
 
 var (
 	ErrRedeemCodeUsed         = errors.New("recharge: redeem code already used")
-	ErrRedeemLimitReached     = errors.New("recharge: user already redeemed")
 	ErrRedeemCodeDeleted      = errors.New("recharge: redeem code deleted")
 	ErrRedeemCodeInvalid      = errors.New("recharge: redeem code invalid")
 	ErrRedeemCodeNotDeletable = errors.New("recharge: used redeem code cannot be deleted")
@@ -118,24 +117,9 @@ func (s *Service) RedeemCode(ctx context.Context, userID uint64, rawCode string)
 		_ = tx.Rollback()
 		return nil, ErrRedeemCodeUsed
 	}
-	var existed uint64
-	err = tx.GetContext(ctx, &existed,
-		`SELECT id FROM redeem_codes WHERE used_by = ? AND deleted_at IS NULL LIMIT 1`, userID)
-	if err == nil {
-		_ = tx.Rollback()
-		return nil, ErrRedeemLimitReached
-	}
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		_ = tx.Rollback()
-		return nil, err
-	}
 	if _, err = tx.ExecContext(ctx,
 		`UPDATE redeem_codes SET used_by = ?, used_at = NOW() WHERE id = ? AND used_by IS NULL`,
 		userID, row.ID); err != nil {
-		if isDuplicateKey(err) {
-			_ = tx.Rollback()
-			return nil, ErrRedeemLimitReached
-		}
 		_ = tx.Rollback()
 		return nil, err
 	}
@@ -164,9 +148,6 @@ func (s *Service) RedeemCode(ctx context.Context, userID uint64, rawCode string)
 		return nil, err
 	}
 	if err = tx.Commit(); err != nil {
-		if isDuplicateKey(err) {
-			return nil, ErrRedeemLimitReached
-		}
 		return nil, err
 	}
 	now := time.Now()

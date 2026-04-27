@@ -62,7 +62,7 @@ export function listMyOrders(params: { status?: string; limit?: number; offset?:
 export function cancelMyOrder(id: number) {
   return http.post(`/api/recharge/orders/${id}/cancel`)
 }
-export function getMyRedeemStatus(): Promise<{ redeemed: boolean; record?: RedeemCode }> {
+export function getMyRedeemStatus(): Promise<{ record?: RedeemCode | null }> {
   return http.get('/api/recharge/redeem-status')
 }
 export function redeemCode(code: string): Promise<RedeemCode> {

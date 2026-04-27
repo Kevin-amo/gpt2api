@@ -23,7 +23,6 @@ const pkgLoaded = ref(false)
 const orderLoaded = ref(false)
 const redeemLoading = ref(false)
 const redeemStatusLoading = ref(false)
-const redeemed = ref(false)
 const redeemRecord = ref<rechargeApi.RedeemCode | null>(null)
 const redeemForm = reactive({ code: '' })
 
@@ -59,7 +58,6 @@ async function loadRedeemStatus() {
   redeemStatusLoading.value = true
   try {
     const d = await rechargeApi.getMyRedeemStatus()
-    redeemed.value = !!d.redeemed
     redeemRecord.value = d.record || null
   } finally {
     redeemStatusLoading.value = false
@@ -75,7 +73,6 @@ async function submitRedeem() {
   redeemLoading.value = true
   try {
     const row = await rechargeApi.redeemCode(code)
-    redeemed.value = true
     redeemRecord.value = row
     redeemForm.code = ''
     await userStore.fetchMe()
@@ -192,31 +189,25 @@ onMounted(() => {
       <div class="flex-between section-header">
         <div>
           <h3>兑换码兑换</h3>
-          <div class="section-hint">每个用户仅可兑换一次，兑换成功后积分立即到账。</div>
+          <div class="section-hint">每个兑换码仅可使用一次，兑换成功后积分立即到账。</div>
         </div>
-        <div class="redeem-status-wrap">
-          <span v-if="redeemStatusLoading" class="inline-loading-text">正在加载兑换状态…</span>
-          <el-tag :type="redeemed ? 'success' : 'warning'" size="small">
-            {{ redeemed ? '已兑换' : '未兑换' }}
-          </el-tag>
-        </div>
+        <span v-if="redeemStatusLoading" class="inline-loading-text">正在加载兑换记录…</span>
       </div>
 
       <div class="redeem-panel">
         <el-input
           v-model="redeemForm.code"
           placeholder="请输入兑换码"
-          :disabled="redeemed"
           clearable
           @keyup.enter="submitRedeem"
         ></el-input>
-        <el-button type="primary" :loading="redeemLoading" :disabled="redeemed" @click="submitRedeem">
+        <el-button type="primary" :loading="redeemLoading" @click="submitRedeem">
           立即兑换
         </el-button>
       </div>
 
       <div v-if="redeemRecord" class="redeem-result">
-        <div class="result-title">兑换记录</div>
+        <div class="result-title">最近一次兑换</div>
         <div class="result-grid">
           <div><span>兑换码</span><b>{{ redeemRecord.code }}</b></div>
           <div><span>到账积分</span><b>{{ formatCredit(redeemRecord.credits) }}</b></div>
