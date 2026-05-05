@@ -434,16 +434,18 @@ func (r *Runner) runOnce(ctx context.Context, opt RunOptions, result *RunResult)
 		zap.Strings("sse_sids_list", sseResult.SedimentIDs),
 	)
 
-	// 聚合 SSE 阶段的所有引用:file-service 优先,sediment 补位
+	// 聚合 SSE 阶段的所有引用:file-service 优先,sediment 仅作为候选补位。
 	var fileRefs []string
 	fileRefs = append(fileRefs, sseResult.FileIDs...)
 	for _, s := range sseResult.SedimentIDs {
 		fileRefs = append(fileRefs, "sed:"+s)
 	}
 
-	// SSE 已经把期望数量的图带回来了 → 直接下载,跳过 Poll,省时间
-	if len(fileRefs) >= opt.N {
-		logger.L().Info("image runner enough refs from SSE, skip polling",
+	// 只有 SSE 直出了足量 file-service 结果时才跳过 Poll。
+	// 单独出现 sediment 往往只是预览/中间态,在图生图场景下直接短路很容易把参考图或
+	// 非终稿结果返回给用户,因此这里继续走 conversation 轮询拿 image_gen tool 里的产物。
+	if len(sseResult.FileIDs) >= opt.N {
+		logger.L().Info("image runner enough file-service refs from SSE, skip polling",
 			zap.String("task_id", opt.TaskID),
 			zap.Uint64("account_id", lease.Account.ID),
 			zap.String("conv_id", convID),
@@ -451,7 +453,7 @@ func (r *Runner) runOnce(ctx context.Context, opt RunOptions, result *RunResult)
 			zap.Strings("refs_list", fileRefs),
 		)
 	} else {
-		// SSE 没给够(常见于 IMG2 只走 tool 消息场景)→ 短轮询补齐。
+		// SSE 没给够 file-service 结果(常见于 IMG2 只先回 sediment / tool 消息场景)→ 短轮询补齐。
 		// 单轮新会话,不需要 baseline:conversation 里出现的每条 image_gen tool 消息
 		// 都是本次请求的产物。
 		pollOpt := chatgpt.PollOpts{
