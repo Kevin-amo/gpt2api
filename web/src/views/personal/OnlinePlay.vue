@@ -8,6 +8,7 @@ import {
   listMyModels,
   streamPlayChat,
   playGenerateImage,
+  playEditImage,
   type SimpleModel,
   type PlayChatMessage,
   type PlayImageData,
@@ -400,6 +401,7 @@ function downloadUrl(url: string) {
 // ====================================================
 interface RefImage {
   name: string
+  file: File
   dataUrl: string
   size: number
 }
@@ -438,6 +440,7 @@ function handleFilePick(e: Event) {
     reader.onload = () => {
       refImages.value.push({
         name: file.name,
+        file,
         dataUrl: String(reader.result || ''),
         size: file.size,
       })
@@ -469,16 +472,16 @@ async function sendImg2Img() {
   i2iResult.value = []
   i2iAbort.value = new AbortController()
   try {
-    const resp = await playGenerateImage(
+    const resp = await playEditImage(
+      selectedImageModel.value,
+      i2iPrompt.value.trim(),
+      refImages.value.map((r) => r.file),
       {
-        model: selectedImageModel.value,
-        prompt: i2iPrompt.value.trim(),
         n: 1,
         size: i2iSize.value,
-        reference_images: refImages.value.map((r) => r.dataUrl),
         upscale: i2iUpscale.value || undefined,
+        signal: i2iAbort.value.signal,
       },
-      i2iAbort.value.signal,
     )
     i2iResult.value = resp.data || []
     if (i2iResult.value.length > 0) {
