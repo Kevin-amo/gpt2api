@@ -568,19 +568,20 @@ func referenceUploadFileIDSet(refs []*chatgpt.UploadedFile) map[string]struct{} 
 	return out
 }
 
-// filterOutReferenceFileIDs 从合并后的 fileRefs 中移除与「用户参考上传」同 id 的 file-service 条目,
-// 保留 sediment(sed:...) —— 参考图只走 file-service,不会以 sed: 形式出现在同一列表里和生成图冲突。
+// filterOutReferenceFileIDs 从合并后的 fileRefs 中移除与「用户参考上传」同 id 的条目。
+//
+// 背景:参考图通常以 file-service://<file_id> attach 到 user message，但在某些 SSE 事件里，
+// 同一个底层对象也可能以 sediment 下载引用("sed:<file_id>")的形式被扫出来。这里只按底层
+// file_id 做归一化比较，确保无论是普通 file-service ref 还是 sed: ref，只要指向上传参考图
+// 就一律剔除，避免图生图最终回传原图。
 func filterOutReferenceFileIDs(fileRefs []string, refSet map[string]struct{}) []string {
 	if len(refSet) == 0 {
 		return fileRefs
 	}
 	out := make([]string, 0, len(fileRefs))
 	for _, ref := range fileRefs {
-		if strings.HasPrefix(ref, "sed:") {
-			out = append(out, ref)
-			continue
-		}
-		if _, skip := refSet[ref]; skip {
+		norm := strings.TrimPrefix(ref, "sed:")
+		if _, skip := refSet[norm]; skip {
 			continue
 		}
 		out = append(out, ref)
